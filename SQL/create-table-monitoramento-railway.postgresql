@@ -1,0 +1,51 @@
+-- SQL DDL para criação da tabela MonitoramentoKurier (Railway Postgres)
+-- Destinada ao monitoramento diário da API Kurier em modo Railway
+-- Deploy: Railway Postgres Database
+
+DROP TABLE IF EXISTS MonitoramentoKurier;
+
+CREATE TABLE MonitoramentoKurier (
+    Id SERIAL PRIMARY KEY,
+    DataExecucao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Quantidades obtidas da API
+    QuantidadeDistribuicoes INTEGER NOT NULL DEFAULT 0,
+    QuantidadePublicacoes INTEGER NOT NULL DEFAULT 0,
+    
+    -- Amostras dos dados (JSON)
+    AmostraDistribuicoes JSONB NULL,
+    AmostraPublicacoes JSONB NULL,
+    
+    -- Metadata da execução
+    TempoExecucaoMs INTEGER NOT NULL DEFAULT 0,
+    StatusExecucao VARCHAR(50) NOT NULL DEFAULT 'Sucesso',
+    MensagemErro TEXT NULL,
+    
+    -- Configurações utilizadas na execução
+    ModoExecucao VARCHAR(20) NOT NULL DEFAULT 'RUN_ONCE',
+    SomenteMonitoramento BOOLEAN NOT NULL DEFAULT TRUE,
+    
+    -- Auditoria
+    CriadoEm TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    AtualizadoEm TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para performance
+CREATE INDEX IX_MonitoramentoKurier_DataExecucao ON MonitoramentoKurier (DataExecucao DESC);
+CREATE INDEX IX_MonitoramentoKurier_StatusExecucao ON MonitoramentoKurier (StatusExecucao);
+CREATE INDEX IX_MonitoramentoKurier_ModoExecucao ON MonitoramentoKurier (ModoExecucao);
+
+-- View para relatórios simplificados
+CREATE OR REPLACE VIEW vw_MonitoramentoKurierResumo AS
+SELECT 
+    Date(DataExecucao) AS DataExecucao,
+    COUNT(*) AS TotalExecucoes,
+    SUM(CASE WHEN StatusExecucao = 'Sucesso' THEN 1 ELSE 0 END) AS ExecucoesSucesso,
+    SUM(CASE WHEN StatusExecucao = 'Erro' THEN 1 ELSE 0 END) AS ExecucoesErro,
+    AVG(QuantidadeDistribuicoes) AS MediaDistribuicoes,
+    AVG(QuantidadePublicacoes) AS MediaPublicacoes,
+    AVG(TempoExecucaoMs) AS MediaTempoExecucaoMs,
+    MAX(DataExecucao) AS UltimaExecucao
+FROM MonitoramentoKurier
+GROUP BY Date(DataExecucao)
+ORDER BY DataExecucao DESC;

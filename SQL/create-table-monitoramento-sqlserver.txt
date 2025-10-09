@@ -1,0 +1,68 @@
+-- SQL DDL para criação da tabela MonitoramentoKurier (SQL Server)
+-- Use este script se estiver rodando localmente com SQL Server
+-- Para Railway, use o arquivo: create-table-monitoramento-railway.sql
+
+IF OBJECT_ID('MonitoramentoKurier', 'U') IS NOT NULL
+    DROP TABLE MonitoramentoKurier;
+
+CREATE TABLE MonitoramentoKurier (
+    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    DataExecucao DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    
+    -- Quantidades obtidas da API
+    QuantidadeDistribuicoes INT NOT NULL DEFAULT 0,
+    QuantidadePublicacoes INT NOT NULL DEFAULT 0,
+    
+    -- Amostras dos dados (JSON) - SQL Server 2016+
+    AmostraDistribuicoes NVARCHAR(MAX) NULL CHECK (ISJSON(AmostraDistribuicoes) = 1),
+    AmostraPublicacoes NVARCHAR(MAX) NULL CHECK (ISJSON(AmostraPublicacoes) = 1),
+    
+    -- Metadata da execução
+    TempoExecucaoMs INT NOT NULL DEFAULT 0,
+    StatusExecucao VARCHAR(50) NOT NULL DEFAULT 'Sucesso',
+    MensagemErro NVARCHAR(MAX) NULL,
+    
+    -- Configurações utilizadas na execução
+    ModoExecucao VARCHAR(20) NOT NULL DEFAULT 'RUN_ONCE',
+    SomenteMonitoramento BIT NOT NULL DEFAULT 1,
+    
+    -- Auditoria
+    CriadoEm DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    AtualizadoEm DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+);
+
+-- Índices para performance
+CREATE INDEX IX_MonitoramentoKurier_DataExecucao 
+    ON MonitoramentoKurier (DataExecucao DESC);
+
+CREATE INDEX IX_MonitoramentoKurier_StatusExecucao 
+    ON MonitoramentoKurier (StatusExecucao);
+
+CREATE INDEX IX_MonitoramentoKurier_ModoExecucao 
+    ON MonitoramentoKurier (ModoExecucao);
+GO
+
+-- View para relatórios simplificados
+CREATE VIEW vw_MonitoramentoKurierResumo AS
+SELECT 
+    CAST(DataExecucao AS DATE) AS DataExecucao,
+    COUNT(*) AS TotalExecucoes,
+    SUM(CASE WHEN StatusExecucao = 'Sucesso' THEN 1 ELSE 0 END) AS ExecucoesSucesso,
+    SUM(CASE WHEN StatusExecucao = 'Erro' THEN 1 ELSE 0 END) AS ExecucoesErro,
+    AVG(CAST(QuantidadeDistribuicoes AS FLOAT)) AS MediaDistribuicoes,
+    AVG(CAST(QuantidadePublicacoes AS FLOAT)) AS MediaPublicacoes,
+    AVG(CAST(TempoExecucaoMs AS FLOAT)) AS MediaTempoExecucaoMs,
+    MAX(DataExecucao) AS UltimaExecucao
+FROM MonitoramentoKurier
+GROUP BY CAST(DataExecucao AS DATE)
+-- No SQL Server usar ORDER BY no SELECT da view não é permitido
+GO
+
+-- Procedure para consultar relatório com ordering
+CREATE PROCEDURE sp_ObterRelatorioMonitoramento
+AS
+BEGIN
+    SELECT * FROM vw_MonitoramentoKurierResumo
+    ORDER BY DataExecucao DESC
+END
+GO

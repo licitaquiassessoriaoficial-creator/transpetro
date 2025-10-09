@@ -39,4 +39,9 @@ public class KurierSettings
     /// Chave para confirmar publicações: "Identificador" ou "NumeroProcesso"
     /// </summary>
     public string? ConfirmarPublicacoesKey { get; set; } = "Identificador";
+
+    /// <summary>
+    /// User-Agent para requisições HTTP
+    /// </summary>
+    public string UserAgent { get; set; } = "BennerKurierWorker/1.0 (Railway)";
 }

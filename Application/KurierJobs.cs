@@ -14,12 +14,32 @@ public class KurierJobs : BackgroundService
 {
     private readonly ILogger<KurierJobs> _logger;
     private readonly IKurierClient _kurierClient;
-    private readonly IBennerGateway _bennerGateway;
+    private readonly IBennerGateway? _bennerGateway;
+    private readonly IRailwayMonitoringGateway? _railwayGateway;
     private readonly KurierJobsSettings _settings;
     private readonly MonitoringSettings _monitoringSettings;
     private readonly Timer? _timer;
     private readonly bool _runOnce;
 
+    // Construtor para Railway (apenas monitoramento)
+    public KurierJobs(
+        ILogger<KurierJobs> logger,
+        IKurierClient kurierClient,
+        IRailwayMonitoringGateway railwayGateway,
+        IOptions<KurierJobsSettings> settings,
+        IOptions<MonitoringSettings> monitoringSettings)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _kurierClient = kurierClient ?? throw new ArgumentNullException(nameof(kurierClient));
+        _railwayGateway = railwayGateway ?? throw new ArgumentNullException(nameof(railwayGateway));
+        _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
+        _monitoringSettings = monitoringSettings?.Value ?? throw new ArgumentNullException(nameof(monitoringSettings));
+
+        _runOnce = true; // Railway sempre executa uma vez
+        _logger.LogInformation("KurierJobs configurado para Railway (modo monitoramento)");
+    }
+
+    // Construtor para execução local (sincronização completa)
     public KurierJobs(
         ILogger<KurierJobs> logger,
         IKurierClient kurierClient,
@@ -33,7 +53,7 @@ public class KurierJobs : BackgroundService
         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
         _monitoringSettings = monitoringSettings?.Value ?? throw new ArgumentNullException(nameof(monitoringSettings));
 
-        // Verificar se deve executar apenas uma vez (para Railway/Cloud)
+        // Verificar se deve executar apenas uma vez
         _runOnce = Environment.GetEnvironmentVariable("RUN_ONCE")?.ToLowerInvariant() == "true";
 
         if (!_runOnce)
@@ -42,7 +62,7 @@ public class KurierJobs : BackgroundService
             _timer = new Timer(ExecuteJobsCallback!, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        _logger.LogInformation("KurierJobs configurado. Modo: {Mode}", _runOnce ? "RUN_ONCE" : "CONTINUOUS");
+        _logger.LogInformation("KurierJobs configurado para execução local. Modo: {Mode}", _runOnce ? "RUN_ONCE" : "CONTINUOUS");
     }
 
     /// <summary>
@@ -390,12 +410,34 @@ public class KurierJobs : BackgroundService
     /// </summary>
     private async Task SalvarMonitoramentoAsync(MonitoramentoKurier monitoramento, CancellationToken cancellationToken)
     {
-        // TODO: Implementar gateway para salvar na tabela MonitoramentoKurier (PostgreSQL)
-        // Para agora, apenas log estruturado do resultado
-        LogRelatorioEstruturado(monitoramento);
-
-        // Simular gravação bem-sucedida por enquanto
-        await Task.Delay(100, cancellationToken);
+        try
+        {
+            if (_railwayGateway != null)
+            {
+                // Salvar no PostgreSQL da Railway
+                var sucesso = await _railwayGateway.SalvarMonitoramentoAsync(monitoramento, cancellationToken);
+                if (sucesso)
+                {
+                    _logger.LogInformation("Monitoramento salvo com sucesso no PostgreSQL Railway");
+                }
+                else
+                {
+                    _logger.LogWarning("Falha ao salvar monitoramento no PostgreSQL Railway");
+                }
+            }
+            else if (_bennerGateway != null)
+            {
+                // Fallback para execução local - apenas log
+                _logger.LogInformation("Execução local: Monitoramento não será salvo no banco");
+            }
+            
+            // Log estruturado do resultado para ambos os casos
+            LogRelatorioEstruturado(monitoramento);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao salvar monitoramento");
+        }
     }
 
     /// <summary>

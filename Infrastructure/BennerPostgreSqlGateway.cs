@@ -1,21 +1,22 @@
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using BennerKurierWorker.Domain;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace BennerKurierWorker.Infrastructure;
 
 /// <summary>
-/// Gateway para operações de persistência no SQL Server do sistema Benner
+/// Gateway para operações de persistência no PostgreSQL da Railway
 /// </summary>
-public class BennerSqlGateway : IBennerGateway
+public class BennerPostgreSqlGateway : IBennerGateway
 {
-    private readonly ILogger<BennerSqlGateway> _logger;
+    private readonly ILogger<BennerPostgreSqlGateway> _logger;
     private readonly string _connectionString;
 
-    public BennerSqlGateway(
-        ILogger<BennerSqlGateway> logger,
+    public BennerPostgreSqlGateway(
+        ILogger<BennerPostgreSqlGateway> logger,
         IOptions<BennerSettings> settings)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -32,7 +33,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -95,7 +96,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -164,7 +165,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -194,7 +195,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -224,7 +225,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -253,7 +254,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
@@ -280,7 +281,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
             
             const string sql = "SELECT 1";
@@ -305,7 +306,7 @@ public class BennerSqlGateway : IBennerGateway
     {
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"

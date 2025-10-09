@@ -120,7 +120,16 @@ public class Program
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
                 // Registrar serviços
-                services.AddScoped<IBennerGateway, BennerSqlGateway>();
+                if (runOnce)
+                {
+                    // Para Railway, usar gateway de monitoramento PostgreSQL
+                    services.AddScoped<IRailwayMonitoringGateway, RailwayMonitoringGateway>();
+                }
+                else
+                {
+                    // Para execução local, usar gateway Benner SQL Server
+                    services.AddScoped<IBennerGateway, BennerPostgreSqlGateway>();
+                }
                 
                 // Configurar o hosted service baseado no modo de execução
                 if (runOnce)

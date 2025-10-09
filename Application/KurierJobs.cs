@@ -176,9 +176,15 @@ public class KurierJobs : BackgroundService
 
             if (distribuicoes.Any())
             {
-                var savedCount = await _bennerGateway.SalvarDistribuicoesAsync(distribuicoes, cancellationToken);
-                
-                _logger.LogInformation("Sincronizadas {Count} distribuições", savedCount);
+                if (_bennerGateway != null)
+                {
+                    var savedCount = await _bennerGateway.SalvarDistribuicoesAsync(distribuicoes, cancellationToken);
+                    _logger.LogInformation("Sincronizadas {Count} distribuições", savedCount);
+                }
+                else
+                {
+                    _logger.LogInformation("Modo Railway: {Count} distribuições encontradas (não salvas no Benner)", distribuicoes.Count());
+                }
             }
             else
             {
@@ -204,9 +210,15 @@ public class KurierJobs : BackgroundService
 
             if (publicacoes.Any())
             {
-                var savedCount = await _bennerGateway.SalvarPublicacoesAsync(publicacoes, cancellationToken);
-                
-                _logger.LogInformation("Sincronizadas {Count} publicações", savedCount);
+                if (_bennerGateway != null)
+                {
+                    var savedCount = await _bennerGateway.SalvarPublicacoesAsync(publicacoes, cancellationToken);
+                    _logger.LogInformation("Sincronizadas {Count} publicações", savedCount);
+                }
+                else
+                {
+                    _logger.LogInformation("Modo Railway: {Count} publicações encontradas (não salvas no Benner)", publicacoes.Count());
+                }
             }
             else
             {
@@ -226,6 +238,12 @@ public class KurierJobs : BackgroundService
     {
         try
         {
+            if (_bennerGateway == null)
+            {
+                _logger.LogInformation("Modo Railway: Confirmação de distribuições não disponível");
+                return;
+            }
+
             var distribuicoesNaoConfirmadas = await _bennerGateway.ObterDistribuicoesNaoConfirmadasAsync(
                 _settings.ConfirmationBatchSize, cancellationToken);
 
@@ -256,6 +274,12 @@ public class KurierJobs : BackgroundService
     {
         try
         {
+            if (_bennerGateway == null)
+            {
+                _logger.LogInformation("Modo Railway: Confirmação de publicações não disponível");
+                return;
+            }
+
             var publicacoesNaoConfirmadas = await _bennerGateway.ObterPublicacoesNaoConfirmadasAsync(
                 _settings.ConfirmationBatchSize, cancellationToken);
 
@@ -280,17 +304,24 @@ public class KurierJobs : BackgroundService
     }
 
     /// <summary>
-    /// Testa conectividade com Kurier e Benner
+    /// Testa conectividade com serviços externos
     /// </summary>
     private async Task<bool> TestarConectividadeAsync(CancellationToken cancellationToken)
     {
         var success = true;
 
-        // Testar conexão com banco de dados
-        if (!await _bennerGateway.TestarConexaoAsync(cancellationToken))
+        // Testar conexão com banco de dados (se disponível)
+        if (_bennerGateway != null)
         {
-            _logger.LogError("Falha na conexão com banco de dados Benner");
-            success = false;
+            if (!await _bennerGateway.TestarConexaoAsync(cancellationToken))
+            {
+                _logger.LogError("Falha na conexão com banco de dados Benner");
+                success = false;
+            }
+        }
+        else
+        {
+            _logger.LogInformation("Modo Railway: Teste de conexão com banco não aplicável");
         }
 
         // Testar conexão com API Kurier (através de uma consulta simples)

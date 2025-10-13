@@ -1,0 +1,7 @@
+# Railway.toml - Configuração para Railway
+[build]
+  builder = "dockerfile"
+
+[deploy]
+  startCommand = "dotnet BennerKurierWorker.dll"
+  restartPolicyType = "never"

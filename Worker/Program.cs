@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
@@ -12,7 +13,7 @@ using static BennerKurierWorker.Application.KurierJobs;
 namespace BennerKurierWorker.Worker;
 
 /// <summary>
-/// Ponto de entrada do Worker Service
+/// Ponto de entrada do Worker Service para integração completa Benner × Kurier
 /// </summary>
 public class Program
 {
@@ -28,6 +29,13 @@ public class Program
         {
             Log.Information("Iniciando BennerKurierWorker");
 
+            // Verificar se é modo de teste
+            if (args.Length > 0 && args[0].Equals("--teste-publicacoes", StringComparison.OrdinalIgnoreCase))
+            {
+                await ExecutarTestePublicacoesAsync(args);
+                return;
+            }
+
             var host = CreateHostBuilder(args).Build();
             await host.RunAsync();
         }
@@ -38,6 +46,59 @@ public class Program
         finally
         {
             await Log.CloseAndFlushAsync();
+        }
+    }
+
+    /// <summary>
+    /// Executa teste específico para publicações
+    /// </summary>
+    private static async Task ExecutarTestePublicacoesAsync(string[] args)
+    {
+        Log.Information("🧪 === MODO TESTE: PUBLICAÇÕES KURIER ===");
+
+        var host = CreateHostBuilder(new string[0]).Build();
+
+        using var scope = host.Services.CreateScope();
+        var kurierClient = scope.ServiceProvider.GetRequiredService<IKurierClient>();
+        var scopeFactory = scope.ServiceProvider.GetRequiredService<IServiceScopeFactory>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var jobSettings = scope.ServiceProvider.GetRequiredService<IOptions<KurierJobsSettings>>();
+        var monitoringSettings = scope.ServiceProvider.GetRequiredService<IOptions<MonitoringSettings>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<KurierJobs>>();
+
+        // Criar instância do KurierJobs diretamente
+        var kurierJobs = new KurierJobs(logger, kurierClient, scopeFactory, configuration, jobSettings, monitoringSettings);
+
+        bool confirmarReal = args.Length > 1 && args[1].Equals("--confirmar", StringComparison.OrdinalIgnoreCase);
+
+        try
+        {
+            // Teste 1: Conectividade
+            Log.Information("📋 Teste 1: Conectividade com Kurier");
+            var conectividade = await kurierClient.TestarConexaoKurierAsync();
+            Log.Information(conectividade ? "✅ Conectividade OK" : "❌ Conectividade FALHOU");
+
+            if (!conectividade)
+            {
+                Log.Error("🚫 Testes interrompidos devido à falha de conectividade");
+                return;
+            }
+
+            // Teste 2: Publicações específicas  
+            Log.Information("📋 Teste 2: Funcionalidades de Publicações");
+            var testePublicacoes = await kurierJobs.TestarPublicacoesKurierAsync();
+            Log.Information(testePublicacoes ? "✅ Publicações OK" : "❌ Publicações FALHARAM");
+
+            // Teste 3: Ingestão
+            Log.Information("📋 Teste 3: Ingestão de Publicações (confirmar={ConfirmarReal})", confirmarReal);
+            var testeIngestao = await kurierJobs.TestarIngestaoPublicacoesAsync(confirmarReal);
+            Log.Information(testeIngestao ? "✅ Ingestão OK" : "❌ Ingestão FALHOU");
+
+            Log.Information("🎉 === TESTE CONCLUÍDO ===");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "💥 Falha crítica no teste de publicações");
         }
     }
 
@@ -56,10 +117,11 @@ public class Program
                 {
                     // Mapear variáveis de ambiente para configurações
                     ["Kurier:BaseUrl"] = Environment.GetEnvironmentVariable("Kurier__BaseUrl"),
-                    ["Kurier:User"] = Environment.GetEnvironmentVariable("Kurier__User"),
-                    ["Kurier:Password"] = Environment.GetEnvironmentVariable("Kurier__Password"),
+                    ["Kurier:Usuario"] = Environment.GetEnvironmentVariable("Kurier__User"),
+                    ["Kurier:Senha"] = Environment.GetEnvironmentVariable("Kurier__Pass"),
                     ["Benner:ConnectionString"] = Environment.GetEnvironmentVariable("Benner__ConnectionString"),
-                    ["RUN_ONCE"] = Environment.GetEnvironmentVariable("RUN_ONCE")
+                    ["RUN_ONCE"] = Environment.GetEnvironmentVariable("RUN_ONCE"),
+                    ["MODE"] = Environment.GetEnvironmentVariable("MODE")
                 }.Where(kvp => !string.IsNullOrEmpty(kvp.Value))!);
             })
             .UseWindowsService(options =>
@@ -79,21 +141,33 @@ public class Program
             {
                 var configuration = hostContext.Configuration;
                 var runOnce = Environment.GetEnvironmentVariable("RUN_ONCE")?.ToLowerInvariant() == "true";
+                var mode = Environment.GetEnvironmentVariable("MODE")?.ToLowerInvariant() ?? "ingest";
 
-                Log.Information("Configurando serviços. RUN_ONCE = {RunOnce}", runOnce);
+                Log.Information("Configurando serviços. RUN_ONCE = {RunOnce}, MODE = {Mode}", runOnce, mode);
 
-                // Configurar settings com suporte a variáveis de ambiente
+                // Configurar settings das duas integrações Kurier com suporte a variáveis de ambiente
                 services.Configure<KurierSettings>(options =>
                 {
                     configuration.GetSection("Kurier").Bind(options);
-                    
                     // Override com variáveis de ambiente se existirem
                     if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__BaseUrl")))
                         options.BaseUrl = Environment.GetEnvironmentVariable("Kurier__BaseUrl")!;
-                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__Usuario")))
-                        options.Usuario = Environment.GetEnvironmentVariable("Kurier__Usuario")!;
-                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__Senha")))
-                        options.Senha = Environment.GetEnvironmentVariable("Kurier__Senha")!;
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__User")))
+                        options.Usuario = Environment.GetEnvironmentVariable("Kurier__User")!;
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__Pass")))
+                        options.Senha = Environment.GetEnvironmentVariable("Kurier__Pass")!;
+                });
+
+                services.Configure<KurierJuridicoSettings>(options =>
+                {
+                    configuration.GetSection("KurierJuridico").Bind(options);
+                    // Override com variáveis de ambiente se existirem
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__BaseUrl")))
+                        options.BaseUrl = Environment.GetEnvironmentVariable("KurierJuridico__BaseUrl")!;
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__User")))
+                        options.Usuario = Environment.GetEnvironmentVariable("KurierJuridico__User")!;
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__Pass")))
+                        options.Senha = Environment.GetEnvironmentVariable("KurierJuridico__Pass")!;
                 });
 
                 services.Configure<BennerSettings>(options =>
@@ -111,42 +185,43 @@ public class Program
                 services.Configure<MonitoringSettings>(
                     configuration.GetSection("Monitoring"));
 
-                // Configurar HttpClient com Polly para retry policy
-                services.AddHttpClient<IKurierClient, KurierClient>(client =>
+                // Configurar HttpClient Factory para as duas integrações Kurier
+                services.AddHttpClient("KurierDistribuicao", client =>
                 {
                     client.Timeout = TimeSpan.FromMinutes(5);
                 })
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-                // Registrar serviços
-                if (runOnce)
+                services.AddHttpClient("KurierJuridico", client =>
                 {
-                    // Para Railway, usar gateway de monitoramento PostgreSQL
+                    client.Timeout = TimeSpan.FromMinutes(5);
+                })
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+                // Registrar o KurierClient como Scoped (não mais como HttpClient typed client)
+                services.AddScoped<IKurierClient, KurierClient>();
+
+                // Registrar serviços baseado no modo de execução
+                if (mode == "monitoring" || runOnce)
+                {
+                    // Para Railway ou modo monitoramento, usar gateway de monitoramento PostgreSQL
                     services.AddScoped<IRailwayMonitoringGateway, RailwayMonitoringGateway>();
+                    Log.Information("Configurado para modo monitoramento (Railway PostgreSQL)");
                 }
                 else
                 {
-                    // Para execução local, usar gateway Benner SQL Server
+                    // Para execução local de integração, usar gateway Benner
                     services.AddScoped<IBennerGateway, BennerPostgreSqlGateway>();
+                    Log.Information("Configurado para modo integração (Benner PostgreSQL)");
                 }
                 
-                // Configurar o hosted service baseado no modo de execução
-                if (runOnce)
-                {
-                    // Para execução única, usar como serviço transiente
-                    services.AddHostedService<KurierJobs>();
-                    Log.Information("Configurado para execução única (RUN_ONCE=true)");
-                }
-                else
-                {
-                    // Para execução contínua, configuração normal
-                    services.AddHostedService<KurierJobs>();
-                    Log.Information("Configurado para execução contínua (RUN_ONCE=false)");
-                }
+                // Configurar o hosted service
+                services.AddHostedService<KurierJobs>();
 
                 // Configurar Health Checks (opcional, pode ser desabilitado em produção)
-                if (!runOnce)
+                if (!runOnce && mode != "monitoring")
                 {
                     services.AddHealthChecks()
                         .AddCheck<BennerHealthCheck>("benner-database")
@@ -243,9 +318,9 @@ public class KurierHealthCheck : IHealthCheck
     {
         try
         {
-            var distribuicoes = await _kurierClient.ConsultarDistribuicoesAsync(cancellationToken);
+            var quantidade = await _kurierClient.ConsultarQuantidadeDistribuicoesAsync(cancellationToken);
             
-            return HealthCheckResult.Healthy($"API Kurier acessível - {distribuicoes.Count} distribuições encontradas");
+            return HealthCheckResult.Healthy($"API Kurier acessível - {quantidade} distribuições disponíveis");
         }
         catch (Exception ex)
         {

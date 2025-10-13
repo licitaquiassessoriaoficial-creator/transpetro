@@ -9,6 +9,15 @@ namespace BennerKurierWorker.Infrastructure;
 /// </summary>
 public interface IKurierClient
 {
+    #region Conexão e Testes
+
+    /// <summary>
+    /// Testa a conexão com a API Kurier em produção
+    /// </summary>
+    Task<bool> TestarConexaoKurierAsync(CancellationToken cancellationToken = default);
+
+    #endregion
+
     #region KDistribuicao (Distribuições)
 
     /// <summary>

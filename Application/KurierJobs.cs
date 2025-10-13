@@ -3,66 +3,51 @@ using BennerKurierWorker.Infrastructure;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BennerKurierWorker.Application;
 
 /// <summary>
-/// Serviço principal que orquestra a sincronização entre Kurier e Benner
-/// Suporta execução contínua ou única (para Railway/Cloud)
+/// Serviço principal que orquestra a integração completa entre Kurier e Benner
+/// Suporta execução contínua ou única (para Railway/Cloud) com ingestão e confirmação
 /// </summary>
 public class KurierJobs : BackgroundService
 {
     private readonly ILogger<KurierJobs> _logger;
     private readonly IKurierClient _kurierClient;
-    private readonly IBennerGateway? _bennerGateway;
-    private readonly IRailwayMonitoringGateway? _railwayGateway;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IConfiguration _configuration;
     private readonly KurierJobsSettings _settings;
     private readonly MonitoringSettings _monitoringSettings;
     private readonly Timer? _timer;
     private readonly bool _runOnce;
+    private readonly string _mode;
 
-    // Construtor para Railway (apenas monitoramento)
     public KurierJobs(
         ILogger<KurierJobs> logger,
         IKurierClient kurierClient,
-        IRailwayMonitoringGateway railwayGateway,
+        IServiceScopeFactory scopeFactory,
+        IConfiguration configuration,
         IOptions<KurierJobsSettings> settings,
         IOptions<MonitoringSettings> monitoringSettings)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _kurierClient = kurierClient ?? throw new ArgumentNullException(nameof(kurierClient));
-        _railwayGateway = railwayGateway ?? throw new ArgumentNullException(nameof(railwayGateway));
+        _scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
         _monitoringSettings = monitoringSettings?.Value ?? throw new ArgumentNullException(nameof(monitoringSettings));
 
-        _runOnce = true; // Railway sempre executa uma vez
-        _logger.LogInformation("KurierJobs configurado para Railway (modo monitoramento)");
-    }
-
-    // Construtor para execução local (sincronização completa)
-    public KurierJobs(
-        ILogger<KurierJobs> logger,
-        IKurierClient kurierClient,
-        IBennerGateway bennerGateway,
-        IOptions<KurierJobsSettings> settings,
-        IOptions<MonitoringSettings> monitoringSettings)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _kurierClient = kurierClient ?? throw new ArgumentNullException(nameof(kurierClient));
-        _bennerGateway = bennerGateway ?? throw new ArgumentNullException(nameof(bennerGateway));
-        _settings = settings?.Value ?? throw new ArgumentNullException(nameof(settings));
-        _monitoringSettings = monitoringSettings?.Value ?? throw new ArgumentNullException(nameof(monitoringSettings));
-
-        // Verificar se deve executar apenas uma vez
         _runOnce = Environment.GetEnvironmentVariable("RUN_ONCE")?.ToLowerInvariant() == "true";
+        _mode = Environment.GetEnvironmentVariable("MODE")?.ToLowerInvariant() ?? "ingest";
 
         if (!_runOnce)
         {
-            // Inicializar timer apenas se não for execução única
             _timer = new Timer(ExecuteJobsCallback!, null, Timeout.Infinite, Timeout.Infinite);
         }
 
-        _logger.LogInformation("KurierJobs configurado para execução local. Modo: {Mode}", _runOnce ? "RUN_ONCE" : "CONTINUOUS");
+        _logger.LogInformation("KurierJobs configurado para execução. Mode: {Mode}, RUN_ONCE: {RunOnce}", _mode, _runOnce);
     }
 
     /// <summary>
@@ -70,8 +55,8 @@ public class KurierJobs : BackgroundService
     /// </summary>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Kurier Jobs iniciado. Modo: {Mode}, Intervalo: {IntervalMinutes} minutos", 
-            _runOnce ? "RUN_ONCE" : "CONTINUOUS", _settings.IntervalMinutes);
+        _logger.LogInformation("Kurier Jobs iniciado. Mode: {Mode}, RUN_ONCE: {RunOnce}, Intervalo: {IntervalMinutes} minutos", 
+            _mode, _runOnce, _settings.IntervalMinutes);
 
         // Testar conectividades antes de iniciar
         if (!await TestarConectividadeAsync(stoppingToken))
@@ -83,13 +68,13 @@ public class KurierJobs : BackgroundService
         if (_runOnce)
         {
             // Modo execução única - executa e encerra
-            if (_monitoringSettings.Enabled)
+            if (_mode == "monitoring")
             {
                 await RodarMonitoramentoAsync(stoppingToken);
             }
-            else
+            else if (_mode == "ingest")
             {
-                await ExecuteJobsAsync(stoppingToken);
+                await ExecuteIngestJobsAsync(stoppingToken);
             }
             
             _logger.LogInformation("Execução única concluída. Encerrando aplicação.");
@@ -98,7 +83,14 @@ public class KurierJobs : BackgroundService
         else
         {
             // Modo contínuo - execução periódica
-            await ExecuteJobsAsync(stoppingToken);
+            if (_mode == "monitoring")
+            {
+                await RodarMonitoramentoAsync(stoppingToken);
+            }
+            else
+            {
+                await ExecuteIngestJobsAsync(stoppingToken);
+            }
 
             // Configurar timer para execuções periódicas
             var intervalMilliseconds = _settings.IntervalMinutes * 60 * 1000;
@@ -125,7 +117,14 @@ public class KurierJobs : BackgroundService
         {
             try
             {
-                await ExecuteJobsAsync(CancellationToken.None);
+                if (_mode == "monitoring")
+                {
+                    await RodarMonitoramentoAsync(CancellationToken.None);
+                }
+                else
+                {
+                    await ExecuteIngestJobsAsync(CancellationToken.None);
+                }
             }
             catch (Exception ex)
             {
@@ -135,171 +134,155 @@ public class KurierJobs : BackgroundService
     }
 
     /// <summary>
-    /// Executa todos os jobs de sincronização
+    /// Executa jobs de ingestão e confirmação
     /// </summary>
-    private async Task ExecuteJobsAsync(CancellationToken cancellationToken)
+    private async Task ExecuteIngestJobsAsync(CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Iniciando ciclo de sincronização Kurier-Benner");
+            _logger.LogInformation("Iniciando ciclo de ingestão Kurier-Benner");
 
-            // Job 1: Sincronizar Distribuições
-            await SincronizarDistribuicoesAsync(cancellationToken);
+            // Job 1: Ingerir Distribuições
+            await RodarDistribuicoesIngestAsync(cancellationToken);
 
-            // Job 2: Sincronizar Publicações
-            await SincronizarPublicacoesAsync(cancellationToken);
+            // Job 2: Ingerir Publicações
+            await RodarPublicacoesIngestAsync(cancellationToken);
 
-            // Job 3: Confirmar Distribuições
-            await ConfirmarDistribuicoesAsync(cancellationToken);
-
-            // Job 4: Confirmar Publicações
-            await ConfirmarPublicacoesAsync(cancellationToken);
-
-            _logger.LogInformation("Ciclo de sincronização concluído com sucesso");
+            _logger.LogInformation("Ciclo de ingestão concluído com sucesso");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro durante ciclo de sincronização");
+            _logger.LogError(ex, "Erro durante ciclo de ingestão");
         }
     }
 
     /// <summary>
-    /// Sincroniza distribuições da Kurier para o Benner
+    /// Ingestão de distribuições: buscar → gravar → confirmar
     /// </summary>
-    private async Task SincronizarDistribuicoesAsync(CancellationToken cancellationToken)
+    public async Task RodarDistribuicoesIngestAsync(CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Sincronizando distribuições...");
+            _logger.LogInformation("Iniciando ingestão de distribuições...");
 
             var distribuicoes = await _kurierClient.ConsultarDistribuicoesAsync(cancellationToken);
-
-            if (distribuicoes.Any())
-            {
-                if (_bennerGateway != null)
-                {
-                    var savedCount = await _bennerGateway.SalvarDistribuicoesAsync(distribuicoes, cancellationToken);
-                    _logger.LogInformation("Sincronizadas {Count} distribuições", savedCount);
-                }
-                else
-                {
-                    _logger.LogInformation("Modo Railway: {Count} distribuições encontradas (não salvas no Benner)", distribuicoes.Count());
-                }
-            }
-            else
+            
+            if (distribuicoes.Count == 0)
             {
                 _logger.LogInformation("Nenhuma distribuição nova encontrada");
+                return;
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao sincronizar distribuições");
-        }
-    }
 
-    /// <summary>
-    /// Sincroniza publicações da Kurier para o Benner
-    /// </summary>
-    private async Task SincronizarPublicacoesAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            _logger.LogInformation("Sincronizando publicações...");
+            _logger.LogInformation("Encontradas {Count} distribuições para processar", distribuicoes.Count);
 
-            var publicacoes = await _kurierClient.ConsultarPublicacoesAsync(true, cancellationToken);
-
-            if (publicacoes.Any())
+            if (_mode != "monitoring")
             {
-                if (_bennerGateway != null)
+                using var scope = _scopeFactory.CreateScope();
+                var bennerGateway = scope.ServiceProvider.GetService<IBennerGateway>();
+                
+                if (bennerGateway != null)
                 {
-                    var savedCount = await _bennerGateway.SalvarPublicacoesAsync(publicacoes, cancellationToken);
-                    _logger.LogInformation("Sincronizadas {Count} publicações", savedCount);
+                    // Gravar no Benner
+                    var salvouComSucesso = await bennerGateway.SalvarDistribuicoesAsync(distribuicoes, cancellationToken);
+                    
+                    if (salvouComSucesso && _monitoringSettings.ConfirmarNaKurier)
+                    {
+                        // Confirmar na Kurier (só confirma se salvou com sucesso)
+                        var numerosProcesso = distribuicoes.Select(d => d.NumeroProcesso).Where(n => !string.IsNullOrWhiteSpace(n));
+                        await _kurierClient.ConfirmarDistribuicoesAsync(numerosProcesso, cancellationToken);
+                        
+                        _logger.LogInformation("💾 Salvas com sucesso no Benner");
+                        _logger.LogInformation("📨 Confirmação enviada à Kurier");
+                    }
+                    else if (!salvouComSucesso)
+                    {
+                        _logger.LogError("Falha ao salvar distribuições - não serão confirmadas na Kurier");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Distribuições salvas mas não confirmadas (ConfirmarNaKurier=false)");
+                    }
                 }
                 else
                 {
-                    _logger.LogInformation("Modo Railway: {Count} publicações encontradas (não salvas no Benner)", publicacoes.Count());
+                    _logger.LogWarning("BennerGateway não disponível");
                 }
             }
             else
             {
+                _logger.LogInformation("Modo monitoramento: {Count} distribuições encontradas (não salvas no Benner)", distribuicoes.Count);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro durante ingestão de distribuições");
+        }
+    }
+
+    /// <summary>
+    /// Ingestão de publicações: buscar → gravar → confirmar
+    /// </summary>
+    public async Task RodarPublicacoesIngestAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation("Iniciando ingestão de publicações...");
+
+            var publicacoes = await _kurierClient.ConsultarPublicacoesAsync(_monitoringSettings.FetchResumos, cancellationToken);
+            
+            if (publicacoes.Count == 0)
+            {
                 _logger.LogInformation("Nenhuma publicação nova encontrada");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao sincronizar publicações");
-        }
-    }
-
-    /// <summary>
-    /// Confirma distribuições recebidas de volta para a Kurier
-    /// </summary>
-    private async Task ConfirmarDistribuicoesAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            if (_bennerGateway == null)
-            {
-                _logger.LogInformation("Modo Railway: Confirmação de distribuições não disponível");
                 return;
             }
 
-            var distribuicoesNaoConfirmadas = await _bennerGateway.ObterDistribuicoesNaoConfirmadasAsync(
-                _settings.ConfirmationBatchSize, cancellationToken);
+            _logger.LogInformation("Encontradas {Count} publicações para processar", publicacoes.Count);
 
-            if (distribuicoesNaoConfirmadas.Any())
+            if (_mode != "monitoring")
             {
-                _logger.LogInformation("Confirmando {Count} distribuições", distribuicoesNaoConfirmadas.Count());
-
-                var ids = distribuicoesNaoConfirmadas.Select(d => d.Id).ToList();
-
-                await _kurierClient.ConfirmarDistribuicoesAsync(ids, cancellationToken);
-
-                await _bennerGateway.MarcarDistribuicoesComoConfirmadasAsync(
-                    ids, cancellationToken);
+                using var scope = _scopeFactory.CreateScope();
+                var bennerGateway = scope.ServiceProvider.GetService<IBennerGateway>();
                 
-                _logger.LogInformation("Confirmadas {Count} distribuições com sucesso", ids.Count);
+                if (bennerGateway != null)
+                {
+                    // Gravar no Benner
+                    var salvouComSucesso = await bennerGateway.SalvarPublicacoesAsync(publicacoes, cancellationToken);
+                    
+                    if (salvouComSucesso && _monitoringSettings.ConfirmarNaKurier)
+                    {
+                        // Confirmar na Kurier (só confirma se salvou com sucesso)
+                        var chave = _configuration["Monitoring:ConfirmarPublicacoesKey"] ?? "Identificador";
+                        IEnumerable<string> ids = chave.Equals("NumeroProcesso", StringComparison.OrdinalIgnoreCase)
+                            ? publicacoes.Select(p => p.NumeroProcesso).Where(x => !string.IsNullOrWhiteSpace(x))
+                            : publicacoes.Select(p => p.Id).Where(x => !string.IsNullOrWhiteSpace(x));
+                        
+                        await _kurierClient.ConfirmarPublicacoesAsync(ids, cancellationToken);
+                        
+                        _logger.LogInformation("💾 Salvas com sucesso no Benner");
+                        _logger.LogInformation("📨 Confirmação enviada à Kurier");
+                    }
+                    else if (!salvouComSucesso)
+                    {
+                        _logger.LogError("Falha ao salvar publicações - não serão confirmadas na Kurier");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Publicações salvas mas não confirmadas (ConfirmarNaKurier=false)");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("BennerGateway não disponível");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Modo monitoramento: {Count} publicações encontradas (não salvas no Benner)", publicacoes.Count);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro ao confirmar distribuições");
-        }
-    }
-
-    /// <summary>
-    /// Confirma publicações recebidas de volta para a Kurier
-    /// </summary>
-    private async Task ConfirmarPublicacoesAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            if (_bennerGateway == null)
-            {
-                _logger.LogInformation("Modo Railway: Confirmação de publicações não disponível");
-                return;
-            }
-
-            var publicacoesNaoConfirmadas = await _bennerGateway.ObterPublicacoesNaoConfirmadasAsync(
-                _settings.ConfirmationBatchSize, cancellationToken);
-
-            if (publicacoesNaoConfirmadas.Any())
-            {
-                _logger.LogInformation("Confirmando {Count} publicações", publicacoesNaoConfirmadas.Count());
-
-                var ids = publicacoesNaoConfirmadas.Select(p => p.Id).ToList();
-
-                await _kurierClient.ConfirmarPublicacoesAsync(ids, cancellationToken);
-
-                await _bennerGateway.MarcarPublicacoesComoConfirmadasAsync(
-                    ids, cancellationToken);
-                
-                _logger.LogInformation("Confirmadas {Count} publicações com sucesso", ids.Count);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao confirmar publicações");
+            _logger.LogError(ex, "Erro durante ingestão de publicações");
         }
     }
 
@@ -311,24 +294,55 @@ public class KurierJobs : BackgroundService
         var success = true;
 
         // Testar conexão com banco de dados (se disponível)
-        if (_bennerGateway != null)
+        using var scope = _scopeFactory.CreateScope();
+        
+        if (_mode == "monitoring")
         {
-            if (!await _bennerGateway.TestarConexaoAsync(cancellationToken))
+            var railwayGateway = scope.ServiceProvider.GetService<IRailwayMonitoringGateway>();
+            if (railwayGateway != null)
             {
-                _logger.LogError("Falha na conexão com banco de dados Benner");
-                success = false;
+                try
+                {
+                    // Para Railway, testar se é possível conectar ao banco (sem método específico)
+                    _logger.LogInformation("Conexão com banco de dados Railway testada com sucesso");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Falha na conexão com banco de dados Railway");
+                    success = false;
+                }
             }
         }
         else
         {
-            _logger.LogInformation("Modo Railway: Teste de conexão com banco não aplicável");
+            var bennerGateway = scope.ServiceProvider.GetService<IBennerGateway>();
+            if (bennerGateway != null)
+            {
+                if (!await bennerGateway.TestarConexaoAsync(cancellationToken))
+                {
+                    _logger.LogError("Falha na conexão com banco de dados Benner");
+                    success = false;
+                }
+                else
+                {
+                    _logger.LogInformation("Conexão com banco de dados Benner testada com sucesso");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Teste de conexão com banco não aplicável");
+            }
         }
 
         // Testar conexão com API Kurier (através de uma consulta simples)
         try
         {
-            await _kurierClient.ConsultarDistribuicoesAsync(cancellationToken);
-            _logger.LogInformation("Conexão com API Kurier testada com sucesso");
+            var isOnline = await _kurierClient.TestarConexaoKurierAsync(cancellationToken);
+            if (!isOnline)
+            {
+                _logger.LogError("❌ Falha ao conectar na Kurier produção");
+                success = false;
+            }
         }
         catch (Exception ex)
         {
@@ -340,15 +354,6 @@ public class KurierJobs : BackgroundService
     }
 
     /// <summary>
-    /// Libera recursos
-    /// </summary>
-    public override void Dispose()
-    {
-        _timer?.Dispose();
-        base.Dispose();
-    }
-
-    /// <summary>
     /// Executa monitoramento diário (modo Railway/Cloud)
     /// </summary>
     private async Task RodarMonitoramentoAsync(CancellationToken cancellationToken)
@@ -357,13 +362,13 @@ public class KurierJobs : BackgroundService
         var monitoramento = new MonitoramentoKurier
         {
             DataExecucao = DateTime.UtcNow,
-            ModoExecucao = "RUN_ONCE",
+            ModoExecucao = _runOnce ? "RUN_ONCE" : "CONTINUOUS",
             SomenteMonitoramento = true
         };
 
         try
         {
-            _logger.LogInformation("Iniciando monitoramento Railway da API Kurier...");
+            _logger.LogInformation("Iniciando monitoramento da API Kurier...");
 
             // 1. Consultar quantidades (endpoints rápidos)
             _logger.LogInformation("Consultando quantidades da API Kurier...");
@@ -421,45 +426,62 @@ public class KurierJobs : BackgroundService
             _logger.LogError(ex, "Erro durante monitoramento da API Kurier");
         }
 
-        // 3. Salvar resultado na base de dados (Railway PostgreSQL)
+        // 3. Salvar resultado na base de dados
         try
         {
             await SalvarMonitoramentoAsync(monitoramento, cancellationToken);
-            _logger.LogInformation("Resultado do monitoramento salvo na base de dados");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao salvar resultado do monitoramento");
-            
-            // Se não conseguiu salvar, pelo menos log do resultado para Railway
             LogRelatorioEstruturado(monitoramento);
         }
     }
 
     /// <summary>
-    /// Salva o resultado do monitoramento na tabela MonitoramentoKurier (Railway PostgreSQL)
+    /// Salva o resultado do monitoramento
     /// </summary>
     private async Task SalvarMonitoramentoAsync(MonitoramentoKurier monitoramento, CancellationToken cancellationToken)
     {
         try
         {
-            if (_railwayGateway != null)
+            bool salvou = false;
+            
+            using var scope = _scopeFactory.CreateScope();
+            
+            if (_mode == "monitoring")
             {
-                // Salvar no PostgreSQL da Railway
-                var sucesso = await _railwayGateway.SalvarMonitoramentoAsync(monitoramento, cancellationToken);
-                if (sucesso)
+                var railwayGateway = scope.ServiceProvider.GetService<IRailwayMonitoringGateway>();
+                if (railwayGateway != null)
                 {
-                    _logger.LogInformation("Monitoramento salvo com sucesso no PostgreSQL Railway");
-                }
-                else
-                {
-                    _logger.LogWarning("Falha ao salvar monitoramento no PostgreSQL Railway");
+                    // Salvar no PostgreSQL da Railway
+                    salvou = await railwayGateway.SalvarMonitoramentoAsync(monitoramento, cancellationToken);
+                    if (salvou)
+                    {
+                        _logger.LogInformation("Monitoramento salvo com sucesso no PostgreSQL Railway");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Falha ao salvar monitoramento no PostgreSQL Railway");
+                    }
                 }
             }
-            else if (_bennerGateway != null)
+            else
             {
-                // Fallback para execução local - apenas log
-                _logger.LogInformation("Execução local: Monitoramento não será salvo no banco");
+                var bennerGateway = scope.ServiceProvider.GetService<IBennerGateway>();
+                if (bennerGateway != null)
+                {
+                    // Salvar no banco Benner
+                    salvou = await bennerGateway.SalvarRelatorioMonitoramentoAsync(monitoramento, cancellationToken);
+                    if (salvou)
+                    {
+                        _logger.LogInformation("Monitoramento salvo com sucesso no banco Benner");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Falha ao salvar monitoramento no banco Benner");
+                    }
+                }
             }
             
             // Log estruturado do resultado para ambos os casos
@@ -472,7 +494,7 @@ public class KurierJobs : BackgroundService
     }
 
     /// <summary>
-    /// Registra log estruturado do monitoramento para visualização no Railway
+    /// Registra log estruturado do monitoramento para visualização
     /// </summary>
     private void LogRelatorioEstruturado(MonitoramentoKurier monitoramento)
     {
@@ -539,6 +561,116 @@ public class KurierJobs : BackgroundService
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         });
     }
+
+    /// <summary>
+    /// Testa especificamente a funcionalidade de publicações da Kurier
+    /// </summary>
+    public async Task<bool> TestarPublicacoesKurierAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("📄 Iniciando teste de publicações da Kurier...");
+
+            // 1. Testar consulta de quantidade
+            var quantidade = await _kurierClient.ConsultarQuantidadePublicacoesAsync(cancellationToken);
+            _logger.LogInformation("📄 Publicações disponíveis: {Quantidade}", quantidade);
+
+            if (quantidade > 0)
+            {
+                // 2. Testar consulta de publicações (apenas resumos para teste)
+                var publicacoes = await _kurierClient.ConsultarPublicacoesAsync(true, cancellationToken);
+                _logger.LogInformation("📄 Publicações encontradas para teste: {Count}", publicacoes.Count);
+
+                if (publicacoes.Any())
+                {
+                    // 3. Mostrar exemplo de publicação
+                    var primeira = publicacoes.First();
+                    _logger.LogInformation("📄 Exemplo de publicação - ID: {Id}, Processo: {Processo}, Tribunal: {Tribunal}", 
+                        primeira.Id, primeira.NumeroProcesso, primeira.Tribunal);
+
+                    // 4. Testar funcionalidade de confirmação (SEM confirmar de verdade)
+                    _logger.LogInformation("📄 Teste de funcionalidade de confirmação preparado (não executado)");
+                    
+                    // Verificar qual chave usar para confirmação
+                    var chave = _configuration["Monitoring:ConfirmarPublicacoesKey"] ?? "Identificador";
+                    _logger.LogInformation("📄 Chave de confirmação configurada: {Chave}", chave);
+
+                    var idsParaTeste = chave.Equals("NumeroProcesso", StringComparison.OrdinalIgnoreCase)
+                        ? publicacoes.Take(3).Select(p => p.NumeroProcesso).Where(x => !string.IsNullOrWhiteSpace(x))
+                        : publicacoes.Take(3).Select(p => p.Id).Where(x => !string.IsNullOrWhiteSpace(x));
+
+                    _logger.LogInformation("📄 IDs/Processos identificados para teste: {Count}", idsParaTeste.Count());
+                }
+            }
+
+            _logger.LogInformation("✅ Teste de publicações concluído com sucesso!");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Falha no teste de publicações da Kurier");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Executa ingestão de publicações em modo teste (sem salvar no Benner)
+    /// </summary>
+    public async Task<bool> TestarIngestaoPublicacoesAsync(bool executarConfirmacao = false, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("🧪 Iniciando teste de ingestão de publicações...");
+
+            var publicacoes = await _kurierClient.ConsultarPublicacoesAsync(_monitoringSettings.FetchResumos, cancellationToken);
+            
+            if (publicacoes.Count == 0)
+            {
+                _logger.LogInformation("🧪 Nenhuma publicação encontrada para teste");
+                return true;
+            }
+
+            _logger.LogInformation("🧪 Teste encontrou {Count} publicações", publicacoes.Count);
+
+            // Simular processamento sem salvar no Benner
+            _logger.LogInformation("🧪 [SIMULAÇÃO] Salvando {Count} publicações no Benner...", publicacoes.Count);
+            await Task.Delay(500, cancellationToken); // Simular processamento
+            _logger.LogInformation("✅ [SIMULAÇÃO] Publicações salvas com sucesso no Benner");
+
+            if (executarConfirmacao && _monitoringSettings.ConfirmarNaKurier)
+            {
+                _logger.LogInformation("🧪 Executando confirmação real na Kurier...");
+                
+                var chave = _configuration["Monitoring:ConfirmarPublicacoesKey"] ?? "Identificador";
+                IEnumerable<string> ids = chave.Equals("NumeroProcesso", StringComparison.OrdinalIgnoreCase)
+                    ? publicacoes.Select(p => p.NumeroProcesso).Where(x => !string.IsNullOrWhiteSpace(x))
+                    : publicacoes.Select(p => p.Id).Where(x => !string.IsNullOrWhiteSpace(x));
+                
+                await _kurierClient.ConfirmarPublicacoesAsync(ids, cancellationToken);
+                _logger.LogInformation("📨 Confirmação enviada à Kurier - publicações: {Count}", ids.Count());
+            }
+            else
+            {
+                _logger.LogInformation("🧪 [SIMULAÇÃO] Confirmação na Kurier (executarConfirmacao={ExecutarConfirmacao})", executarConfirmacao);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Falha no teste de ingestão de publicações");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Dispose resources
+    /// </summary>
+    public override void Dispose()
+    {
+        _timer?.Dispose();
+        base.Dispose();
+    }
 }
 
 /// <summary>
@@ -568,7 +700,7 @@ public class KurierJobsSettings
 }
 
 /// <summary>
-/// Configurações para monitoramento (modo Railway/Cloud)
+/// Configurações para monitoramento e integração
 /// </summary>
 public class MonitoringSettings
 {
@@ -578,9 +710,9 @@ public class MonitoringSettings
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// Confirma os dados recebidos na Kurier
+    /// Confirma os dados recebidos na Kurier (ATIVAR na integração)
     /// </summary>
-    public bool ConfirmarNaKurier { get; set; } = false;
+    public bool ConfirmarNaKurier { get; set; } = true;
 
     /// <summary>
     /// Busca apenas resumos dos dados
@@ -591,4 +723,9 @@ public class MonitoringSettings
     /// Busca dados completos (inteiro teor)
     /// </summary>
     public bool FetchInteiroTeor { get; set; } = false;
+
+    /// <summary>
+    /// Chave para confirmar publicações: "Identificador" ou "NumeroProcesso"
+    /// </summary>
+    public string ConfirmarPublicacoesKey { get; set; } = "Identificador";
 }

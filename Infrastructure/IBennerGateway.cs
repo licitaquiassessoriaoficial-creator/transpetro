@@ -8,22 +8,22 @@ namespace BennerKurierWorker.Infrastructure;
 public interface IBennerGateway
 {
     /// <summary>
-    /// Salva uma lista de distribuições no banco de dados
+    /// Salva uma lista de distribuições no banco de dados e retorna sucesso da operação
     /// </summary>
     /// <param name="distribuicoes">Lista de distribuições</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
-    /// <returns>Número de registros salvos</returns>
-    Task<int> SalvarDistribuicoesAsync(
+    /// <returns>True se todas foram salvas com sucesso, false em caso de erro</returns>
+    Task<bool> SalvarDistribuicoesAsync(
         IEnumerable<Distribuicao> distribuicoes, 
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Salva uma lista de publicações no banco de dados
+    /// Salva uma lista de publicações no banco de dados e retorna sucesso da operação
     /// </summary>
     /// <param name="publicacoes">Lista de publicações</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
-    /// <returns>Número de registros salvos</returns>
-    Task<int> SalvarPublicacoesAsync(
+    /// <returns>True se todas foram salvas com sucesso, false em caso de erro</returns>
+    Task<bool> SalvarPublicacoesAsync(
         IEnumerable<Publicacao> publicacoes, 
         CancellationToken cancellationToken = default);
 

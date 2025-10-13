@@ -8,7 +8,7 @@ using System.Text.Json;
 namespace BennerKurierWorker.Infrastructure;
 
 /// <summary>
-/// Gateway para operações de persistência no PostgreSQL da Railway
+/// Gateway para operações de persistência no PostgreSQL (Benner)
 /// </summary>
 public class BennerPostgreSqlGateway : IBennerGateway
 {
@@ -25,9 +25,9 @@ public class BennerPostgreSqlGateway : IBennerGateway
     }
 
     /// <summary>
-    /// Salva uma lista de distribuições no banco de dados
+    /// Salva uma lista de distribuições no banco de dados com transação
     /// </summary>
-    public async Task<int> SalvarDistribuicoesAsync(
+    public async Task<bool> SalvarDistribuicoesAsync(
         IEnumerable<Distribuicao> distribuicoes, 
         CancellationToken cancellationToken = default)
     {
@@ -35,62 +35,60 @@ public class BennerPostgreSqlGateway : IBennerGateway
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
+            
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
             const string sql = @"
-                MERGE Distribuicoes AS target
-                USING (SELECT @Id, @NumeroProcesso, @NumeroDocumento, @TipoDistribuicao, 
-                              @Destinatario, @DataDistribuicao, @DataLimite, @Conteudo, 
-                              @Tribunal, @Vara, @Status, @DataRecebimento, @Confirmada, 
-                              @DataConfirmacao, @Observacoes) AS source 
-                       (Id, NumeroProcesso, NumeroDocumento, TipoDistribuicao, 
-                        Destinatario, DataDistribuicao, DataLimite, Conteudo, 
-                        Tribunal, Vara, Status, DataRecebimento, Confirmada, 
-                        DataConfirmacao, Observacoes)
-                ON target.Id = source.Id
-                WHEN NOT MATCHED THEN
-                    INSERT (Id, NumeroProcesso, NumeroDocumento, TipoDistribuicao, 
-                           Destinatario, DataDistribuicao, DataLimite, Conteudo, 
-                           Tribunal, Vara, Status, DataRecebimento, Confirmada, 
-                           DataConfirmacao, Observacoes)
-                    VALUES (source.Id, source.NumeroProcesso, source.NumeroDocumento, 
-                           source.TipoDistribuicao, source.Destinatario, source.DataDistribuicao, 
-                           source.DataLimite, source.Conteudo, source.Tribunal, source.Vara, 
-                           source.Status, source.DataRecebimento, source.Confirmada, 
-                           source.DataConfirmacao, source.Observacoes)
-                WHEN MATCHED AND target.Confirmada = 0 THEN
-                    UPDATE SET 
-                        NumeroProcesso = source.NumeroProcesso,
-                        NumeroDocumento = source.NumeroDocumento,
-                        TipoDistribuicao = source.TipoDistribuicao,
-                        Destinatario = source.Destinatario,
-                        DataDistribuicao = source.DataDistribuicao,
-                        DataLimite = source.DataLimite,
-                        Conteudo = source.Conteudo,
-                        Tribunal = source.Tribunal,
-                        Vara = source.Vara,
-                        Status = source.Status,
-                        Observacoes = source.Observacoes;";
+                INSERT INTO distribuicoes (
+                    id, numero_processo, numero_documento, tipo_distribuicao, 
+                    destinatario, data_distribuicao, data_limite, conteudo, 
+                    tribunal, vara, status, data_recebimento, confirmada, 
+                    data_confirmacao, observacoes
+                ) VALUES (
+                    @Id, @NumeroProcesso, @NumeroDocumento, @TipoDistribuicao, 
+                    @Destinatario, @DataDistribuicao, @DataLimite, @Conteudo, 
+                    @Tribunal, @Vara, @Status, @DataRecebimento, @Confirmada, 
+                    @DataConfirmacao, @Observacoes
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                    numero_processo = EXCLUDED.numero_processo,
+                    numero_documento = EXCLUDED.numero_documento,
+                    tipo_distribuicao = EXCLUDED.tipo_distribuicao,
+                    destinatario = EXCLUDED.destinatario,
+                    data_distribuicao = EXCLUDED.data_distribuicao,
+                    data_limite = EXCLUDED.data_limite,
+                    conteudo = EXCLUDED.conteudo,
+                    tribunal = EXCLUDED.tribunal,
+                    vara = EXCLUDED.vara,
+                    status = EXCLUDED.status,
+                    observacoes = EXCLUDED.observacoes
+                WHERE distribuicoes.confirmada = false";
 
             var rowsAffected = 0;
             foreach (var distribuicao in distribuicoes)
             {
-                rowsAffected += await connection.ExecuteAsync(sql, distribuicao);
+                distribuicao.DataRecebimento = DateTime.UtcNow;
+                distribuicao.Confirmada = false;
+                
+                rowsAffected += await connection.ExecuteAsync(sql, distribuicao, transaction);
             }
 
+            await transaction.CommitAsync(cancellationToken);
+            
             _logger.LogInformation("Salvaram-se {Count} distribuições no banco de dados", rowsAffected);
-            return rowsAffected;
+            return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao salvar distribuições no banco de dados");
-            throw;
+            return false;
         }
     }
 
     /// <summary>
-    /// Salva uma lista de publicações no banco de dados
+    /// Salva uma lista de publicações no banco de dados com transação
     /// </summary>
-    public async Task<int> SalvarPublicacoesAsync(
+    public async Task<bool> SalvarPublicacoesAsync(
         IEnumerable<Publicacao> publicacoes, 
         CancellationToken cancellationToken = default)
     {
@@ -98,61 +96,57 @@ public class BennerPostgreSqlGateway : IBennerGateway
         {
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
+            
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
             const string sql = @"
-                MERGE Publicacoes AS target
-                USING (SELECT @Id, @NumeroProcesso, @TipoPublicacao, @Titulo, @Conteudo, 
-                              @DataPublicacao, @FontePublicacao, @Tribunal, @Vara, @Magistrado, 
-                              @Partes, @Advogados, @UrlDocumento, @Categoria, @Status, 
-                              @DataRecebimento, @Confirmada, @DataConfirmacao, @Observacoes) AS source 
-                       (Id, NumeroProcesso, TipoPublicacao, Titulo, Conteudo, 
-                        DataPublicacao, FontePublicacao, Tribunal, Vara, Magistrado, 
-                        Partes, Advogados, UrlDocumento, Categoria, Status, 
-                        DataRecebimento, Confirmada, DataConfirmacao, Observacoes)
-                ON target.Id = source.Id
-                WHEN NOT MATCHED THEN
-                    INSERT (Id, NumeroProcesso, TipoPublicacao, Titulo, Conteudo, 
-                           DataPublicacao, FontePublicacao, Tribunal, Vara, Magistrado, 
-                           Partes, Advogados, UrlDocumento, Categoria, Status, 
-                           DataRecebimento, Confirmada, DataConfirmacao, Observacoes)
-                    VALUES (source.Id, source.NumeroProcesso, source.TipoPublicacao, 
-                           source.Titulo, source.Conteudo, source.DataPublicacao, 
-                           source.FontePublicacao, source.Tribunal, source.Vara, 
-                           source.Magistrado, source.Partes, source.Advogados, 
-                           source.UrlDocumento, source.Categoria, source.Status, 
-                           source.DataRecebimento, source.Confirmada, source.DataConfirmacao, 
-                           source.Observacoes)
-                WHEN MATCHED AND target.Confirmada = 0 THEN
-                    UPDATE SET 
-                        NumeroProcesso = source.NumeroProcesso,
-                        TipoPublicacao = source.TipoPublicacao,
-                        Titulo = source.Titulo,
-                        Conteudo = source.Conteudo,
-                        DataPublicacao = source.DataPublicacao,
-                        FontePublicacao = source.FontePublicacao,
-                        Tribunal = source.Tribunal,
-                        Vara = source.Vara,
-                        Magistrado = source.Magistrado,
-                        Partes = source.Partes,
-                        Advogados = source.Advogados,
-                        UrlDocumento = source.UrlDocumento,
-                        Categoria = source.Categoria,
-                        Status = source.Status,
-                        Observacoes = source.Observacoes;";
+                INSERT INTO publicacoes (
+                    id, numero_processo, tipo_publicacao, titulo, conteudo, 
+                    data_publicacao, fonte_publicacao, tribunal, vara, magistrado, 
+                    partes, advogados, url_documento, categoria, status, 
+                    data_recebimento, confirmada, data_confirmacao, observacoes
+                ) VALUES (
+                    @Id, @NumeroProcesso, @TipoPublicacao, @Titulo, @Conteudo, 
+                    @DataPublicacao, @FontePublicacao, @Tribunal, @Vara, @Magistrado, 
+                    @Partes, @Advogados, @UrlDocumento, @Categoria, @Status, 
+                    @DataRecebimento, @Confirmada, @DataConfirmacao, @Observacoes
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                    numero_processo = EXCLUDED.numero_processo,
+                    tipo_publicacao = EXCLUDED.tipo_publicacao,
+                    titulo = EXCLUDED.titulo,
+                    conteudo = EXCLUDED.conteudo,
+                    data_publicacao = EXCLUDED.data_publicacao,
+                    fonte_publicacao = EXCLUDED.fonte_publicacao,
+                    tribunal = EXCLUDED.tribunal,
+                    vara = EXCLUDED.vara,
+                    magistrado = EXCLUDED.magistrado,
+                    partes = EXCLUDED.partes,
+                    advogados = EXCLUDED.advogados,
+                    url_documento = EXCLUDED.url_documento,
+                    categoria = EXCLUDED.categoria,
+                    status = EXCLUDED.status,
+                    observacoes = EXCLUDED.observacoes
+                WHERE publicacoes.confirmada = false";
 
             var rowsAffected = 0;
             foreach (var publicacao in publicacoes)
             {
-                rowsAffected += await connection.ExecuteAsync(sql, publicacao);
+                publicacao.DataRecebimento = DateTime.UtcNow;
+                publicacao.Confirmada = false;
+                
+                rowsAffected += await connection.ExecuteAsync(sql, publicacao, transaction);
             }
 
+            await transaction.CommitAsync(cancellationToken);
+            
             _logger.LogInformation("Salvaram-se {Count} publicações no banco de dados", rowsAffected);
-            return rowsAffected;
+            return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao salvar publicações no banco de dados");
-            throw;
+            return false;
         }
     }
 
@@ -169,10 +163,11 @@ public class BennerPostgreSqlGateway : IBennerGateway
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
-                SELECT TOP (@Limite) * 
-                FROM Distribuicoes 
-                WHERE Confirmada = 0 
-                ORDER BY DataRecebimento";
+                SELECT * 
+                FROM distribuicoes 
+                WHERE confirmada = false 
+                ORDER BY data_recebimento
+                LIMIT @Limite";
 
             var distribuicoes = await connection.QueryAsync<Distribuicao>(sql, new { Limite = limite });
             
@@ -199,10 +194,11 @@ public class BennerPostgreSqlGateway : IBennerGateway
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
-                SELECT TOP (@Limite) * 
-                FROM Publicacoes 
-                WHERE Confirmada = 0 
-                ORDER BY DataRecebimento";
+                SELECT * 
+                FROM publicacoes 
+                WHERE confirmada = false 
+                ORDER BY data_recebimento
+                LIMIT @Limite";
 
             var publicacoes = await connection.QueryAsync<Publicacao>(sql, new { Limite = limite });
             
@@ -229,11 +225,11 @@ public class BennerPostgreSqlGateway : IBennerGateway
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
-                UPDATE Distribuicoes 
-                SET Confirmada = 1, DataConfirmacao = GETDATE() 
-                WHERE Id IN @Ids";
+                UPDATE distribuicoes 
+                SET confirmada = true, data_confirmacao = CURRENT_TIMESTAMP 
+                WHERE id = ANY(@Ids)";
 
-            var rowsAffected = await connection.ExecuteAsync(sql, new { Ids = ids });
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Ids = ids.ToArray() });
             
             _logger.LogInformation("Marcadas {Count} distribuições como confirmadas", rowsAffected);
             return rowsAffected;
@@ -258,11 +254,11 @@ public class BennerPostgreSqlGateway : IBennerGateway
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
-                UPDATE Publicacoes 
-                SET Confirmada = 1, DataConfirmacao = GETDATE() 
-                WHERE Id IN @Ids";
+                UPDATE publicacoes 
+                SET confirmada = true, data_confirmacao = CURRENT_TIMESTAMP 
+                WHERE id = ANY(@Ids)";
 
-            var rowsAffected = await connection.ExecuteAsync(sql, new { Ids = ids });
+            var rowsAffected = await connection.ExecuteAsync(sql, new { Ids = ids.ToArray() });
             
             _logger.LogInformation("Marcadas {Count} publicações como confirmadas", rowsAffected);
             return rowsAffected;
@@ -310,14 +306,17 @@ public class BennerPostgreSqlGateway : IBennerGateway
             await connection.OpenAsync(cancellationToken);
 
             const string sql = @"
-                INSERT INTO RelatoriosMonitoramento 
-                (Id, DataExecucao, QuantidadeDistribuicoes, QuantidadePublicacoes, 
-                 AmostraDistribuicoes, AmostraPublicacoes, Status, Mensagem, 
-                 TempoExecucaoSegundos, UltimaAtualizacaoDistribuicoes, UltimaAtualizacaoPublicacoes)
-                VALUES 
-                (@Id, @DataExecucao, @QuantidadeDistribuicoes, @QuantidadePublicacoes, 
-                 @AmostraDistribuicoes, @AmostraPublicacoes, @Status, @Mensagem, 
-                 @TempoExecucaoSegundos, @UltimaAtualizacaoDistribuicoes, @UltimaAtualizacaoPublicacoes)";
+                INSERT INTO relatorios_monitoramento (
+                    id, data_execucao, quantidade_distribuicoes, quantidade_publicacoes, 
+                    amostra_distribuicoes, amostra_publicacoes, status, mensagem, 
+                    tempo_execucao_segundos, ultima_atualizacao_distribuicoes, ultima_atualizacao_publicacoes,
+                    created_at
+                ) VALUES (
+                    @Id, @DataExecucao, @QuantidadeDistribuicoes, @QuantidadePublicacoes, 
+                    @AmostraDistribuicoes::jsonb, @AmostraPublicacoes::jsonb, @StatusExecucao, @MensagemErro, 
+                    @TempoExecucaoMs / 1000.0, @UltimaAtualizacaoDistribuicoes, @UltimaAtualizacaoPublicacoes,
+                    CURRENT_TIMESTAMP
+                )";
 
             var rowsAffected = await connection.ExecuteAsync(sql, relatorio);
             
@@ -330,12 +329,4 @@ public class BennerPostgreSqlGateway : IBennerGateway
             return false;
         }
     }
-}
-
-/// <summary>
-/// Configurações para o gateway Benner
-/// </summary>
-public class BennerSettings
-{
-    public string ConnectionString { get; set; } = string.Empty;
 }

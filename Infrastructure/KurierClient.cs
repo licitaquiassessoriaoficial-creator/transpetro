@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -142,42 +142,111 @@ public class KurierClient : IKurierClient, IDisposable
 
     /// <summary>
     /// Consulta quantidade de distribuições disponíveis para consumo na Kurier Distribuição
-    /// GET /api/KDistribuicao/ConsultarQuantidadeDistribuicoesDisponiveis
+    /// Implementa estratégia de fallback com múltiplas rotas
     /// </summary>
     public async Task<int> ConsultarQuantidadeDistribuicoesAsync(CancellationToken cancellationToken = default)
     {
-        const string endpoint = "api/KDistribuicao/ConsultarQuantidadeDistribuicoesDisponiveis";
+        _logger.LogInformation("🔵 Consultando quantidade de distribuições na Kurier (produção)...");
+
+        // Lista de endpoints para tentar em ordem de prioridade
+        var endpoints = new[]
+        {
+            "api/KDistribuicao/ConsultarQuantidadeDistribuicoesDisponiveis",
+            "api/KDistribuicao/QuantidadeDistribuicoesDisponiveis"
+        };
+
+        // Tentativas com endpoints diretos de quantidade
+        foreach (var endpoint in endpoints)
+        {
+            try
+            {
+                var fullUrl = new Uri(_httpDistribuicao.BaseAddress!, endpoint).ToString();
+                _logger.LogInformation("🔍 Tentando rota: {Endpoint}", endpoint);
+
+                var response = await _httpDistribuicao.GetAsync(endpoint, cancellationToken);
+                _logger.LogInformation("📡 Status retornado: {StatusCode} para {Endpoint}", response.StatusCode, endpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    
+                    if (int.TryParse(jsonContent.Trim('"'), out var quantidade))
+                    {
+                        _logger.LogInformation("✅ Quantidade obtida via {Endpoint}: {Quantidade} distribuições", endpoint, quantidade);
+                        return quantidade;
+                    }
+
+                    _logger.LogWarning("⚠️ Resposta inválida de {Endpoint}: {Content}", endpoint, jsonContent);
+                    continue;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    _logger.LogWarning("⚠️ Endpoint não encontrado (404): {Endpoint} - tentando próxima rota", endpoint);
+                    continue;
+                }
+
+                // Outros status codes (4xx/5xx) não são fallback, são erros reais
+                _logger.LogError("❌ Erro HTTP {StatusCode} em {Endpoint}: {FullUrl}", response.StatusCode, endpoint, fullUrl);
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                throw new HttpRequestException($"Erro HTTP {response.StatusCode} ao consultar {fullUrl}: {errorContent}");
+            }
+            catch (HttpRequestException)
+            {
+                throw; // Re-lançar erros HTTP para não mascarar problemas reais
+            }
+            catch (TaskCanceledException ex) when (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning("⏰ Timeout ao consultar {Endpoint}", endpoint);
+                throw new HttpRequestException($"Timeout ao consultar {endpoint}", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Erro inesperado ao consultar {Endpoint}", endpoint);
+                continue; // Tentar próximo endpoint
+            }
+        }
+
+        // Fallback: consultar lista completa e contar itens
+        _logger.LogInformation("🔄 Iniciando fallback: consultando lista de distribuições para contar itens");
         
         try
         {
-            _logger.LogInformation("� Consultando distribuições na Kurier (produção)...");
-            
+            const string fallbackEndpoint = "api/KDistribuicao/ConsultarDistribuicoes";
+            var fallbackUrl = new Uri(_httpDistribuicao.BaseAddress!, fallbackEndpoint).ToString();
+            _logger.LogInformation("🔍 Fallback - Tentando rota: {Endpoint}", fallbackEndpoint);
+
             var response = await _retryPolicy.ExecuteAsync(async () =>
             {
-                return await _httpDistribuicao.GetAsync(endpoint, cancellationToken);
+                return await _httpDistribuicao.GetAsync(fallbackEndpoint, cancellationToken);
             });
 
-            response.EnsureSuccessStatusCode();
-            var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            
-            if (int.TryParse(jsonContent.Trim('"'), out var quantidade))
+            _logger.LogInformation("📡 Fallback - Status retornado: {StatusCode} para {Endpoint}", response.StatusCode, fallbackEndpoint);
+
+            if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("📦 Distribuições encontradas: {Quantidade}", quantidade);
+                var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var distribuicoes = JsonSerializer.Deserialize<List<Distribuicao>>(jsonContent, _jsonOptions) 
+                    ?? new List<Distribuicao>();
+
+                var quantidade = distribuicoes.Count;
+                _logger.LogInformation("✅ Fallback bem-sucedido: {Quantidade} distribuições encontradas via consulta de lista", quantidade);
                 return quantidade;
             }
 
-            _logger.LogWarning("Resposta inválida para quantidade de distribuições: {Content}", jsonContent);
-            return 0;
+            _logger.LogError("❌ Fallback falhou - Status: {StatusCode} para {FallbackUrl}", response.StatusCode, fallbackUrl);
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException($"Fallback falhou - Erro HTTP {response.StatusCode} ao consultar {fallbackUrl}: {errorContent}");
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestException)
         {
-            _logger.LogError(ex, "❌ Erro de rede ao consultar quantidade de distribuições");
-            throw;
+            throw; // Re-lançar para manter mensagem de erro clara
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Erro ao consultar quantidade de distribuições");
-            throw;
+            _logger.LogError(ex, "❌ Erro crítico no fallback ao consultar distribuições");
+            var fallbackUrl = new Uri(_httpDistribuicao.BaseAddress!, "api/KDistribuicao/ConsultarDistribuicoes").ToString();
+            throw new HttpRequestException($"Erro crítico no fallback ao consultar {fallbackUrl}", ex);
         }
     }
 
@@ -250,7 +319,7 @@ public class KurierClient : IKurierClient, IDisposable
             });
 
             response.EnsureSuccessStatusCode();
-            _logger.LogInformation("� Confirmação enviada à Kurier (Distribuição): {Count} distribuições", numeros.Count);
+            _logger.LogInformation("🟩 Confirmação enviada à Kurier (Distribuição): {Count} distribuições", numeros.Count);
         }
         catch (HttpRequestException ex)
         {
@@ -318,7 +387,7 @@ public class KurierClient : IKurierClient, IDisposable
         
         try
         {
-            _logger.LogInformation("� Consultando publicações na Kurier Jurídico (produção)...");
+            _logger.LogInformation("🟣 Consultando publicações na Kurier Jurídico (produção)...");
             
             var response = await _retryPolicy.ExecuteAsync(async () =>
             {
@@ -330,7 +399,7 @@ public class KurierClient : IKurierClient, IDisposable
             
             if (int.TryParse(jsonContent.Trim('"'), out var quantidade))
             {
-                _logger.LogInformation("� Publicações encontradas: {Quantidade}", quantidade);
+                _logger.LogInformation("📜 Publicações encontradas: {Quantidade}", quantidade);
                 return quantidade;
             }
 
@@ -358,7 +427,7 @@ public class KurierClient : IKurierClient, IDisposable
     {
         try
         {
-            _logger.LogInformation("� Consultando publicações na Kurier Jurídico (produção) - Resumos: {SomenteResumos}...", somenteResumos);
+            _logger.LogInformation("🟣 Consultando publicações na Kurier Jurídico (produção) - Resumos: {SomenteResumos}...", somenteResumos);
             
             var query = somenteResumos ? "?somenteResumos=true" : "";
             var endpoint = $"api/KJuridico/ConsultarPublicacoes{query}";
@@ -374,7 +443,7 @@ public class KurierClient : IKurierClient, IDisposable
             var publicacoes = JsonSerializer.Deserialize<List<Publicacao>>(jsonContent, _jsonOptions) 
                 ?? new List<Publicacao>();
 
-            _logger.LogInformation("� Publicações encontradas: {Count}", publicacoes.Count);
+            _logger.LogInformation("📜 Publicações encontradas: {Count}", publicacoes.Count);
             return publicacoes.AsReadOnly();
         }
         catch (HttpRequestException ex)
@@ -422,7 +491,7 @@ public class KurierClient : IKurierClient, IDisposable
             });
 
             response.EnsureSuccessStatusCode();
-            _logger.LogInformation("� Confirmação enviada à Kurier (Jurídico): {Count} publicações", ids.Count);
+            _logger.LogInformation("🟩 Confirmação enviada à Kurier (Jurídico): {Count} publicações", ids.Count);
         }
         catch (HttpRequestException ex)
         {

@@ -5,3 +5,19 @@
 [deploy]
   startCommand = "dotnet BennerKurierWorker.dll"
   restartPolicyType = "never"
+
+[variables]
+  # Kurier Distribuição
+  Kurier__BaseUrl = "https://www.kurierservicos.com.br/wsservicos/"
+  Kurier__User = "o.de.quadro.distribuicao"
+  Kurier__Pass = "855B07EB-99CE-46F1-81CC-4785B090DD72"
+  
+  # Kurier Jurídico  
+  KurierJuridico__BaseUrl = "https://www.kurierservicos.com.br/wsservicos/"
+  KurierJuridico__User = "osvaldoquadro"
+  KurierJuridico__Pass = "159811"
+  
+  # Configuração do Worker
+  MODE = "monitoring"
+  RUN_ONCE = "false"
+  ASPNETCORE_ENVIRONMENT = "Production"

@@ -1,4 +1,4 @@
-# Deploy para Railway - BennerKurierWorker
+# Deploy para Railway - BennerKurierWorker  
 # Execute este script para fazer deploy com as configurações corretas
 
 Write-Host "🚀 Iniciando deploy para Railway..." -ForegroundColor Green

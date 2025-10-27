@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
+using System.Net;
 using static BennerKurierWorker.Application.KurierJobs;
 
 namespace BennerKurierWorker.Worker;
@@ -19,6 +20,12 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        // Configurar ServicePointManager para compatibilidade com sistemas legados
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+        ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+        ServicePointManager.Expect100Continue = false;
+        ServicePointManager.UseNagleAlgorithm = false;
+
         // Configurar Serilog antes de tudo
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()

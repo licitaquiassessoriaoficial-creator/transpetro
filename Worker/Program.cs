@@ -5,8 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
@@ -46,105 +46,8 @@ public class Program
                 return;
             }
 
-            // Criar WebApplication para suportar endpoints de relay
-            var builder = WebApplication.CreateBuilder(args);
-            ConfigureServices(builder);
-            
-            var app = builder.Build();
-            ConfigureApp(app);
-            
-            // Adicionar endpoint de relay para Benner → Railway → Kurier
-            app.MapPost("/api/relay", async (HttpContext context, IHttpClientFactory httpClientFactory, ILogger<Program> logger) =>
-            {
-                try
-                {
-                    logger.LogInformation("🔄 Relay: Recebendo requisição do Benner para Kurier");
-                    
-                    // Ler o corpo da requisição do Benner
-                    using var reader = new StreamReader(context.Request.Body);
-                    var requestBody = await reader.ReadToEndAsync();
-                    
-                    logger.LogInformation("📨 Relay: Corpo da requisição ({Size} chars): {Preview}", 
-                        requestBody.Length, 
-                        requestBody.Length > 200 ? requestBody.Substring(0, 200) + "..." : requestBody);
-                    
-                    // Criar HttpClient para chamada HTTPS à Kurier
-                    var client = httpClientFactory.CreateClient("KurierRelay");
-                    
-                    // Preparar requisição para Kurier (HTTPS)
-                    var kurierRequest = new HttpRequestMessage(HttpMethod.Post, "https://www.kurierservicos.com.br/wsservicos/")
-                    {
-                        Content = new StringContent(requestBody, System.Text.Encoding.UTF8, 
-                            context.Request.ContentType ?? "application/xml")
-                    };
-                    
-                    // Copiar headers relevantes (exceto Host)
-                    foreach (var header in context.Request.Headers)
-                    {
-                        if (header.Key.ToLower() != "host" && header.Key.ToLower() != "content-length")
-                        {
-                            kurierRequest.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
-                        }
-                    }
-                    
-                    logger.LogInformation("🌐 Relay: Enviando para Kurier HTTPS...");
-                    
-                    // Enviar para Kurier
-                    var kurierResponse = await client.SendAsync(kurierRequest);
-                    var responseBody = await kurierResponse.Content.ReadAsStringAsync();
-                    
-                    logger.LogInformation("✅ Relay: Resposta da Kurier - Status: {Status}, Tamanho: {Size} chars", 
-                        kurierResponse.StatusCode, responseBody.Length);
-                    
-                    // Retornar resposta para o Benner
-                    context.Response.StatusCode = (int)kurierResponse.StatusCode;
-                    
-                    // Copiar headers de resposta
-                    foreach (var header in kurierResponse.Headers)
-                    {
-                        context.Response.Headers[header.Key] = header.Value.ToArray();
-                    }
-                    
-                    if (kurierResponse.Content.Headers != null)
-                    {
-                        foreach (var header in kurierResponse.Content.Headers)
-                        {
-                            context.Response.Headers[header.Key] = header.Value.ToArray();
-                        }
-                    }
-                    
-                    await context.Response.WriteAsync(responseBody);
-                    
-                    logger.LogInformation("🎉 Relay: Requisição processada com sucesso");
-                }
-                catch (HttpRequestException httpEx)
-                {
-                    logger.LogError(httpEx, "❌ Relay: Erro HTTP ao chamar Kurier");
-                    context.Response.StatusCode = 502; // Bad Gateway
-                    await context.Response.WriteAsync($"Erro de conectividade com Kurier: {httpEx.Message}");
-                }
-                catch (TaskCanceledException timeoutEx)
-                {
-                    logger.LogError(timeoutEx, "⏰ Relay: Timeout ao chamar Kurier");
-                    context.Response.StatusCode = 504; // Gateway Timeout
-                    await context.Response.WriteAsync($"Timeout na chamada para Kurier: {timeoutEx.Message}");
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "💥 Relay: Erro inesperado");
-                    context.Response.StatusCode = 500; // Internal Server Error
-                    await context.Response.WriteAsync($"Erro interno do relay: {ex.Message}");
-                }
-            });
-            
-            // Endpoint de health check
-            app.MapGet("/health", () => Results.Ok(new { 
-                status = "healthy", 
-                timestamp = DateTime.UtcNow,
-                service = "BennerKurierWorker Relay"
-            }));
-            
-            await app.RunAsync();
+            var host = CreateHostBuilder(args).Build();
+            await host.RunAsync();
         }
         catch (Exception ex)
         {
@@ -210,129 +113,7 @@ public class Program
     }
 
     /// <summary>
-    /// Configura os serviços da aplicação
-    /// </summary>
-    private static void ConfigureServices(WebApplicationBuilder builder)
-    {
-        var configuration = builder.Configuration;
-        var runOnce = Environment.GetEnvironmentVariable("RUN_ONCE")?.ToLowerInvariant() == "true";
-        var mode = Environment.GetEnvironmentVariable("MODE")?.ToLowerInvariant() ?? "ingest";
-
-        Log.Information("Configurando serviços Web. RUN_ONCE = {RunOnce}, MODE = {Mode}", runOnce, mode);
-
-        // Configurar Serilog
-        builder.Host.UseSerilog((context, services, configuration) => configuration
-            .ReadFrom.Configuration(context.Configuration)
-            .ReadFrom.Services(services)
-            .Enrich.FromLogContext()
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-            .WriteTo.File("logs/benner-kurier-.txt", 
-                rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 30,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}"));
-
-        // Configurar settings
-        builder.Services.Configure<KurierSettings>(options =>
-        {
-            configuration.GetSection("Kurier").Bind(options);
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__BaseUrl")))
-                options.BaseUrl = Environment.GetEnvironmentVariable("Kurier__BaseUrl")!;
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__User")))
-                options.Usuario = Environment.GetEnvironmentVariable("Kurier__User")!;
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Kurier__Pass")))
-                options.Senha = Environment.GetEnvironmentVariable("Kurier__Pass")!;
-        });
-
-        builder.Services.Configure<KurierJuridicoSettings>(options =>
-        {
-            configuration.GetSection("KurierJuridico").Bind(options);
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__BaseUrl")))
-                options.BaseUrl = Environment.GetEnvironmentVariable("KurierJuridico__BaseUrl")!;
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__User")))
-                options.Usuario = Environment.GetEnvironmentVariable("KurierJuridico__User")!;
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KurierJuridico__Pass")))
-                options.Senha = Environment.GetEnvironmentVariable("KurierJuridico__Pass")!;
-        });
-
-        builder.Services.Configure<BennerSettings>(options =>
-        {
-            configuration.GetSection("Benner").Bind(options);
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("Benner__ConnectionString")))
-                options.ConnectionString = Environment.GetEnvironmentVariable("Benner__ConnectionString")!;
-        });
-
-        builder.Services.Configure<KurierJobsSettings>(configuration.GetSection("Jobs"));
-        builder.Services.Configure<MonitoringSettings>(configuration.GetSection("Monitoring"));
-
-        // HttpClient para relay
-        builder.Services.AddHttpClient("KurierRelay", client =>
-        {
-            client.Timeout = TimeSpan.FromMinutes(2);
-            client.DefaultRequestHeaders.Add("User-Agent", "BennerKurierWorker-Relay/1.0");
-        })
-        .AddPolicyHandler(GetRetryPolicy())
-        .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-        // HttpClients para integração normal
-        builder.Services.AddHttpClient("KurierDistribuicao", client =>
-        {
-            client.Timeout = TimeSpan.FromMinutes(5);
-        })
-        .AddPolicyHandler(GetRetryPolicy())
-        .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-        builder.Services.AddHttpClient("KurierJuridico", client =>
-        {
-            client.Timeout = TimeSpan.FromMinutes(5);
-        })
-        .AddPolicyHandler(GetRetryPolicy())
-        .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-        // Registrar serviços de negócio
-        builder.Services.AddScoped<IKurierClient, KurierClient>();
-        
-        // Registrar serviços baseado no modo de execução
-        if (mode == "monitoring")
-        {
-            builder.Services.AddScoped<IRailwayMonitoringGateway, RailwayMonitoringGateway>();
-            Log.Information("Configurado para modo monitoramento (Railway PostgreSQL)");
-        }
-        else if (mode == "integration")
-        {
-            builder.Services.AddScoped<IBennerGateway, BennerSqlServerGateway>();
-            Log.Information("Configurado para modo integração (Benner SQL Server)");
-        }
-        else
-        {
-            builder.Services.AddScoped<IBennerGateway, BennerSqlServerGateway>();
-            Log.Information("Configurado para modo padrão (Benner SQL Server)");
-        }
-        
-        // Worker service (opcional, só se não for só relay)
-        if (mode != "relay")
-        {
-            builder.Services.AddHostedService<KurierJobs>();
-        }
-    }
-
-    /// <summary>
-    /// Configura a aplicação web
-    /// </summary>
-    private static void ConfigureApp(WebApplication app)
-    {
-        // Configurar pipeline de middleware básico
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        app.UseRouting();
-        
-        Log.Information("🌐 WebApplication configurada com endpoints de relay");
-    }
-
-    /// <summary>
-    /// Configura o host do Worker Service (método antigo mantido para compatibilidade)
+    /// Configura o host do Worker Service
     /// </summary>
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
@@ -441,15 +222,15 @@ public class Program
                 }
                 else if (mode == "integration")
                 {
-                    // Para execução de integração com Benner, usar gateway Benner SQL Server
-                    services.AddScoped<IBennerGateway, BennerSqlServerGateway>();
-                    Log.Information("Configurado para modo integração (Benner SQL Server)");
+                    // Para execução de integração com Benner, usar gateway Benner
+                    services.AddScoped<IBennerGateway, BennerPostgreSqlGateway>();
+                    Log.Information("Configurado para modo integração (Benner)");
                 }
                 else
                 {
                     // Modo padrão - usar gateway Benner
-                    services.AddScoped<IBennerGateway, BennerSqlServerGateway>();
-                    Log.Information("Configurado para modo padrão (Benner SQL Server)");
+                    services.AddScoped<IBennerGateway, BennerPostgreSqlGateway>();
+                    Log.Information("Configurado para modo padrão (Benner)");
                 }
                 
                 // Configurar o hosted service

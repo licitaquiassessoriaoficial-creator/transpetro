@@ -8,12 +8,12 @@
 
 [variables]
   # Kurier Distribuição - URLs HTTPS conforme documentação oficial
-  Kurier__BaseUrl = "https://kurier.benner.com.br/"
+  Kurier__BaseUrl = "https://www.kurierservicos.com.br/"
   Kurier__User = "o.de.quadro.distribuicao"
   Kurier__Pass = "855B07EB-99CE-46F1-81CC-4785B090DD72"
   
-  # Kurier Jurídico - URLs HTTPS conforme documentação oficial
-  KurierJuridico__BaseUrl = "https://kurier.benner.com.br/"
+  # Kurier Jurídico - URLs HTTPS conforme documentação oficial  
+  KurierJuridico__BaseUrl = "https://www.kurierservicos.com.br/"
   KurierJuridico__User = "osvaldoquadro"
   KurierJuridico__Pass = "159811"
   

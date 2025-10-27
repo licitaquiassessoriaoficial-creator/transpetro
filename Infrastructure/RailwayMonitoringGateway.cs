@@ -17,11 +17,14 @@ public class RailwayMonitoringGateway : IRailwayMonitoringGateway
 
     public RailwayMonitoringGateway(
         ILogger<RailwayMonitoringGateway> logger,
-        IOptions<BennerSettings> settings)
+        IOptions<RailwaySettings> railwaySettings)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _connectionString = settings?.Value?.ConnectionString ?? 
-            throw new ArgumentNullException(nameof(settings));
+        
+        // Primeiro tenta Railway settings, depois variável de ambiente
+        _connectionString = railwaySettings?.Value?.ConnectionString ?? 
+                           Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                           throw new ArgumentNullException("Railway connection string não encontrada");
     }
 
     /// <summary>

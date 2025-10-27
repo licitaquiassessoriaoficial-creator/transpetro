@@ -189,6 +189,15 @@ public class Program
                         options.ConnectionString = Environment.GetEnvironmentVariable("Benner__ConnectionString")!;
                 });
 
+                services.Configure<RailwaySettings>(options =>
+                {
+                    configuration.GetSection("Railway").Bind(options);
+                    
+                    // Override com variável de ambiente se existir (Railway usa DATABASE_URL)
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DATABASE_URL")))
+                        options.ConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")!;
+                });
+
                 services.Configure<KurierJobsSettings>(
                     configuration.GetSection("Jobs"));
                 

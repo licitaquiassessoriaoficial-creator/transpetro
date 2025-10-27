@@ -40,7 +40,7 @@ BEGIN
   CREATE TEMP TABLE _p(nome TEXT, valor TEXT, sigiloso BOOLEAN) ON COMMIT DROP;
 
   INSERT INTO _p(nome, valor, sigiloso) VALUES
-    ('BaseUrl',           'https://www.kurierservicos.com.br/wsservicos/', FALSE),
+    ('BaseUrl',           'http://www.kurierservicos.com.br/wsservicos/', FALSE),
     ('UserAgent',         'BennerKurierWorker/1.0',                         FALSE),
     ('TimeoutSeconds',    '100',                                            FALSE),
     ('MaxRetries',        '3',                                              FALSE),

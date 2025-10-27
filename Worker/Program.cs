@@ -9,6 +9,7 @@ using Polly;
 using Polly.Extensions.Http;
 using Serilog;
 using System.Net;
+using System.Text.Json;
 using static BennerKurierWorker.Application.KurierJobs;
 
 namespace BennerKurierWorker.Worker;

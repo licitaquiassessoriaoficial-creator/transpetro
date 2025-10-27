@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -269,11 +270,44 @@ public class KurierClient : IKurierClient, IDisposable
             response.EnsureSuccessStatusCode();
             var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
             
-            var distribuicoes = JsonSerializer.Deserialize<List<Distribuicao>>(jsonContent, _jsonOptions) 
-                ?? new List<Distribuicao>();
+            try
+            {
+                var distribuicoes = JsonSerializer.Deserialize<List<Distribuicao>>(jsonContent, _jsonOptions) 
+                    ?? new List<Distribuicao>();
 
-            _logger.LogInformation("📦 Distribuições encontradas: {Count}", distribuicoes.Count);
-            return distribuicoes.AsReadOnly();
+                _logger.LogInformation("📦 Distribuições encontradas: {Count}", distribuicoes.Count);
+                return distribuicoes.AsReadOnly();
+            }
+            catch (JsonException ex) when (ex.Message.Contains("DateTime"))
+            {
+                _logger.LogWarning("⚠️ Erro de parsing DateTime, tentando deserialização como string...");
+                
+                // Fallback: deserializar como dynamic e converter manualmente
+                var jsonDoc = JsonDocument.Parse(jsonContent);
+                var distribuicoes = new List<Distribuicao>();
+                
+                foreach (var element in jsonDoc.RootElement.EnumerateArray())
+                {
+                    var dist = new Distribuicao
+                    {
+                        Id = element.TryGetProperty("id", out var idProp) ? idProp.GetString() ?? string.Empty : string.Empty,
+                        NumeroProcesso = element.TryGetProperty("numeroProcesso", out var procProp) ? procProp.GetString() ?? string.Empty : string.Empty,
+                        NumeroDocumento = element.TryGetProperty("numeroDocumento", out var docProp) ? docProp.GetString() ?? string.Empty : string.Empty,
+                        TipoDistribuicao = element.TryGetProperty("tipoDistribuicao", out var tipoProp) ? tipoProp.GetString() ?? string.Empty : string.Empty,
+                        Destinatario = element.TryGetProperty("destinatario", out var destProp) ? destProp.GetString() ?? string.Empty : string.Empty,
+                        DataDistribuicao = ParseDateTimeSafe(element, "dataDistribuicao"),
+                        DataLimite = ParseDateTimeSafeNullable(element, "dataLimite"),
+                        Conteudo = element.TryGetProperty("conteudo", out var contProp) ? contProp.GetString() ?? string.Empty : string.Empty,
+                        Tribunal = element.TryGetProperty("tribunal", out var tribProp) ? tribProp.GetString() ?? string.Empty : string.Empty,
+                        Vara = element.TryGetProperty("vara", out var varaProp) ? varaProp.GetString() ?? string.Empty : string.Empty,
+                        Observacoes = element.TryGetProperty("observacoes", out var obsProp) ? obsProp.GetString() : null
+                    };
+                    distribuicoes.Add(dist);
+                }
+                
+                _logger.LogInformation("📦 Distribuições parseadas manualmente: {Count}", distribuicoes.Count);
+                return distribuicoes.AsReadOnly();
+            }
         }
         catch (HttpRequestException ex)
         {
@@ -439,11 +473,48 @@ public class KurierClient : IKurierClient, IDisposable
             response.EnsureSuccessStatusCode();
             var jsonContent = await response.Content.ReadAsStringAsync(cancellationToken);
             
-            var publicacoes = JsonSerializer.Deserialize<List<Publicacao>>(jsonContent, _jsonOptions) 
-                ?? new List<Publicacao>();
+            try
+            {
+                var publicacoes = JsonSerializer.Deserialize<List<Publicacao>>(jsonContent, _jsonOptions) 
+                    ?? new List<Publicacao>();
 
-            _logger.LogInformation("📜 Publicações encontradas: {Count}", publicacoes.Count);
-            return publicacoes.AsReadOnly();
+                _logger.LogInformation("📜 Publicações encontradas: {Count}", publicacoes.Count);
+                return publicacoes.AsReadOnly();
+            }
+            catch (JsonException ex) when (ex.Message.Contains("DateTime"))
+            {
+                _logger.LogWarning("⚠️ Erro de parsing DateTime nas publicações, tentando deserialização manual...");
+                
+                // Fallback para publicações
+                var jsonDoc = JsonDocument.Parse(jsonContent);
+                var publicacoes = new List<Publicacao>();
+                
+                foreach (var element in jsonDoc.RootElement.EnumerateArray())
+                {
+                    var pub = new Publicacao
+                    {
+                        Id = element.TryGetProperty("id", out var idProp) ? idProp.GetString() ?? string.Empty : string.Empty,
+                        NumeroProcesso = element.TryGetProperty("numeroProcesso", out var procProp) ? procProp.GetString() ?? string.Empty : string.Empty,
+                        TipoPublicacao = element.TryGetProperty("tipoPublicacao", out var tipoProp) ? tipoProp.GetString() ?? string.Empty : string.Empty,
+                        Titulo = element.TryGetProperty("titulo", out var titProp) ? titProp.GetString() ?? string.Empty : string.Empty,
+                        Conteudo = element.TryGetProperty("conteudo", out var contProp) ? contProp.GetString() ?? string.Empty : string.Empty,
+                        DataPublicacao = ParseDateTimeSafe(element, "dataPublicacao"),
+                        FontePublicacao = element.TryGetProperty("fontePublicacao", out var fonteProp) ? fonteProp.GetString() ?? string.Empty : string.Empty,
+                        Tribunal = element.TryGetProperty("tribunal", out var tribProp) ? tribProp.GetString() ?? string.Empty : string.Empty,
+                        Vara = element.TryGetProperty("vara", out var varaProp) ? varaProp.GetString() ?? string.Empty : string.Empty,
+                        Magistrado = element.TryGetProperty("magistrado", out var magProp) ? magProp.GetString() : null,
+                        Partes = element.TryGetProperty("partes", out var partProp) ? partProp.GetString() ?? string.Empty : string.Empty,
+                        Advogados = element.TryGetProperty("advogados", out var advProp) ? advProp.GetString() : null,
+                        UrlDocumento = element.TryGetProperty("urlDocumento", out var urlProp) ? urlProp.GetString() : null,
+                        Categoria = element.TryGetProperty("categoria", out var catProp) ? catProp.GetString() ?? string.Empty : string.Empty,
+                        Observacoes = element.TryGetProperty("observacoes", out var obsProp) ? obsProp.GetString() : null
+                    };
+                    publicacoes.Add(pub);
+                }
+                
+                _logger.LogInformation("📜 Publicações parseadas manualmente: {Count}", publicacoes.Count);
+                return publicacoes.AsReadOnly();
+            }
         }
         catch (HttpRequestException ex)
         {
@@ -569,5 +640,61 @@ public class KurierClient : IKurierClient, IDisposable
     {
         _httpDistribuicao?.Dispose();
         _httpJuridico?.Dispose();
+    }
+
+    /// <summary>
+    /// Parse seguro de DateTime a partir de JsonElement
+    /// </summary>
+    private static DateTime ParseDateTimeSafe(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var dateProp))
+            return DateTime.MinValue;
+
+        if (dateProp.ValueKind == JsonValueKind.String)
+        {
+            var dateString = dateProp.GetString();
+            if (string.IsNullOrEmpty(dateString))
+                return DateTime.MinValue;
+
+            // Tentar vários formatos comuns
+            var formats = new[]
+            {
+                "dd/MM/yyyy HH:mm:ss",
+                "dd/MM/yyyy",
+                "yyyy-MM-dd HH:mm:ss", 
+                "yyyy-MM-dd",
+                "yyyy-MM-ddTHH:mm:ss",
+                "yyyy-MM-ddTHH:mm:ssZ",
+                "dd-MM-yyyy HH:mm:ss",
+                "dd-MM-yyyy"
+            };
+
+            foreach (var format in formats)
+            {
+                if (DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                    return date;
+            }
+
+            // Fallback para parsing padrão
+            if (DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
+                return parsedDate;
+        }
+
+        return DateTime.MinValue;
+    }
+
+    /// <summary>
+    /// Parse seguro de DateTime? a partir de JsonElement
+    /// </summary>
+    private static DateTime? ParseDateTimeSafeNullable(JsonElement element, string propertyName)
+    {
+        if (!element.TryGetProperty(propertyName, out var dateProp))
+            return null;
+
+        if (dateProp.ValueKind == JsonValueKind.Null)
+            return null;
+
+        var result = ParseDateTimeSafe(element, propertyName);
+        return result == DateTime.MinValue ? null : result;
     }
 }

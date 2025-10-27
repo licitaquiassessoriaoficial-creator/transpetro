@@ -148,14 +148,13 @@ public class KurierClient : IKurierClient, IDisposable
     {
         _logger.LogInformation("🔵 Consultando quantidade de distribuições na Kurier (produção)...");
 
-        // Lista de endpoints para tentar em ordem de prioridade
+        // Lista de endpoints para tentar em ordem de prioridade (sem fallback longo)
         var endpoints = new[]
         {
-            "api/KDistribuicao/ConsultarQuantidadeDistribuicoesDisponiveis",
-            "api/KDistribuicao/QuantidadeDistribuicoesDisponiveis"
+            "api/KDistribuicao/QuantidadeDistribuicoesDisponiveis"  // Endpoint que funciona
         };
 
-        // Tentativas com endpoints diretos de quantidade
+        // Tentativas com endpoint direto que sabemos que funciona
         foreach (var endpoint in endpoints)
         {
             try

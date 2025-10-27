@@ -151,7 +151,7 @@ public class KurierClient : IKurierClient, IDisposable
         // Lista de endpoints para tentar em ordem de prioridade
         var endpoints = new[]
         {
-            "Help/Api/GET-api-KDistribuicao-ConsultarQuantidadeDistribuicoesDisponiveis",
+            "api/KDistribuicao/ConsultarQuantidadeDistribuicoesDisponiveis",
             "api/KDistribuicao/QuantidadeDistribuicoesDisponiveis"
         };
 
@@ -212,7 +212,7 @@ public class KurierClient : IKurierClient, IDisposable
         
         try
         {
-            const string fallbackEndpoint = "Help/Api/GET-api-KDistribuicao-ConsultarDistribuicoes";
+            const string fallbackEndpoint = "api/KDistribuicao/ConsultarDistribuicoes";
             var fallbackUrl = new Uri(_httpDistribuicao.BaseAddress!, fallbackEndpoint).ToString();
             _logger.LogInformation("🔍 Fallback - Tentando rota: {Endpoint}", fallbackEndpoint);
 
@@ -245,7 +245,7 @@ public class KurierClient : IKurierClient, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ Erro crítico no fallback ao consultar distribuições");
-            var fallbackUrl = new Uri(_httpDistribuicao.BaseAddress!, "Help/Api/GET-api-KDistribuicao-ConsultarDistribuicoes").ToString();
+            var fallbackUrl = new Uri(_httpDistribuicao.BaseAddress!, "api/KDistribuicao/ConsultarDistribuicoes").ToString();
             throw new HttpRequestException($"Erro crítico no fallback ao consultar {fallbackUrl}", ex);
         }
     }
@@ -256,7 +256,7 @@ public class KurierClient : IKurierClient, IDisposable
     /// </summary>
     public async Task<IReadOnlyList<Distribuicao>> ConsultarDistribuicoesAsync(CancellationToken cancellationToken = default)
     {
-        const string endpoint = "Help/Api/GET-api-KDistribuicao-ConsultarDistribuicoes";
+        const string endpoint = "api/KDistribuicao/ConsultarDistribuicoes";
         
         try
         {
@@ -295,7 +295,7 @@ public class KurierClient : IKurierClient, IDisposable
     /// </summary>
     public async Task ConfirmarDistribuicoesAsync(IEnumerable<string> numerosProcesso, CancellationToken cancellationToken = default)
     {
-        const string endpoint = "Help/Api/POST-api-KDistribuicao-ConfirmarDistribuicoes";
+        const string endpoint = "api/KDistribuicao/ConfirmarDistribuicoes";
         
         try
         {
@@ -383,7 +383,7 @@ public class KurierClient : IKurierClient, IDisposable
     /// </summary>
     public async Task<int> ConsultarQuantidadePublicacoesAsync(CancellationToken cancellationToken = default)
     {
-        const string endpoint = "Help/Api/GET-api-KJuridico-ConsultarQuantidadePublicacoesDisponiveis";
+        const string endpoint = "api/KJuridico/ConsultarQuantidadePublicacoesDisponiveis";
         
         try
         {
@@ -430,7 +430,7 @@ public class KurierClient : IKurierClient, IDisposable
             _logger.LogInformation("🟣 Consultando publicações na Kurier Jurídico (produção) - Resumos: {SomenteResumos}...", somenteResumos);
             
             var query = somenteResumos ? "?somenteResumos=true" : "";
-            var endpoint = $"Help/Api/GET-api-KJuridico-ConsultarPublicacoes{query}";
+            var endpoint = $"api/KJuridico/ConsultarPublicacoes{query}";
 
             var response = await _retryPolicy.ExecuteAsync(async () =>
             {
@@ -465,7 +465,7 @@ public class KurierClient : IKurierClient, IDisposable
     /// </summary>
     public async Task ConfirmarPublicacoesAsync(IEnumerable<string> idsOuNumerosProcesso, CancellationToken cancellationToken = default)
     {
-        const string endpoint = "Help/Api/POST-api-KJuridico-ConfirmarPublicacoes";
+                const string endpoint = "api/KPublicacao/ConfirmarPublicacoes";
         
         try
         {
@@ -535,7 +535,7 @@ public class KurierClient : IKurierClient, IDisposable
                 queryParams.Add($"estado={Uri.EscapeDataString(estado)}");
 
             var query = "?" + string.Join("&", queryParams);
-            var endpoint = $"Help/Api/GET-api-KJuridico-ConsultarPublicacoesPersonalizado{query}";
+            var endpoint = $"api/KJuridico/ConsultarPublicacoesPersonalizado{query}";
 
             var response = await _retryPolicy.ExecuteAsync(async () =>
             {

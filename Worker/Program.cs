@@ -220,9 +220,9 @@ public class Program
                 }
                 else
                 {
-                    // Para execução local de integração, usar gateway Benner
-                    services.AddScoped<IBennerGateway, BennerPostgreSqlGateway>();
-                    Log.Information("Configurado para modo integração (Benner PostgreSQL)");
+                    // Para execução local de integração, usar gateway Benner SQL Server
+                    services.AddScoped<IBennerGateway, BennerSqlServerGateway>();
+                    Log.Information("Configurado para modo integração (Benner SQL Server)");
                 }
                 
                 // Configurar o hosted service

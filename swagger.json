@@ -1,0 +1,6719 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "V1",
+    "title": "Catálogo de APIs Benner",
+    "x-swagger-net-version": "8.3.12.104",
+    "contact": {
+      "name": "Benner Sistemas",
+      "url": "http://www.benner.com.br"
+    }
+  },
+  "host": "seguro-pjur.transpetro.com.br",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/api/Agenda": {
+      "get": {
+        "tags": [
+          "Agenda"
+        ],
+        "operationId": "Agenda_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "codigoCompromisso",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/AtualizaItensLoteStatus": {
+      "get": {
+        "tags": [
+          "AtualizaItensLoteStatus"
+        ],
+        "operationId": "AtualizaItensLoteStatus_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/CampoCalculado": {
+      "get": {
+        "tags": [
+          "CampoCalculado"
+        ],
+        "operationId": "CampoCalculado_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/acesso/consultarAcessos.svc": {
+      "get": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_ListarAcessos",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ListaAcessosResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/usuario/consultarUsuario.svc/{Chave}": {
+      "get": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_ConsultaAcessousuario",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "Chave",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.AcessoUsuarioResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/usuario/consultarUsuarios.svc": {
+      "get": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_ConsultaAcessoTodos",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.AcessoUsuarioResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/acesso/ConcederAcessoUsuario.svc": {
+      "post": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_Post",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.Root"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/acesso/validarAcessos.svc": {
+      "get": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_Valida",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request.usuario.chave",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.nome",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.funcao",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.imovel",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.nomeGestor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.chaveGestor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.telefone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.dataVigenciaAcessoInicio",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.dataVigenciaAcessoFim",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.usuario.itemList",
+            "in": "query",
+            "required": false,
+            "items": {
+              "type": "object"
+            },
+            "collectionFormat": "multi",
+            "type": "array"
+          },
+          {
+            "name": "request.usuario.nivelList",
+            "in": "query",
+            "required": false,
+            "items": {},
+            "collectionFormat": "multi",
+            "type": "array"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValidaAcessoResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/Cast/usuario/removerAcessoUsuario.svc": {
+      "post": {
+        "tags": [
+          "CAST"
+        ],
+        "operationId": "CAST_RemoverAcesso",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.RemoverAcessoRequest.Root"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/centrocustos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "CentrosDeCustos"
+        ],
+        "summary": "Buscar Centros de Custos",
+        "operationId": "CentrosDeCustos_BuscarCentroCusto",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/ChartsImobiliario": {
+      "get": {
+        "tags": [
+          "ChartsImobiliario"
+        ],
+        "operationId": "ChartsImobiliario_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/ChartsMainPage": {
+      "get": {
+        "tags": [
+          "ChartsMainPage"
+        ],
+        "operationId": "ChartsMainPage_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "type": "object"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/Classificacao": {
+      "get": {
+        "tags": [
+          "Classificacao"
+        ],
+        "operationId": "Classificacao_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Controllers.Api.ClassificacaoController.Registro"
+              },
+              "xml": {
+                "name": "Registro",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/clearcache": {
+      "post": {
+        "tags": [
+          "ClearCache"
+        ],
+        "summary": "Limpa caches com ou sem reiniciar a pool.",
+        "operationId": "ClearCache_ClearCache",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "reloadPoolString",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Represents a HTTP response message.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/clearcachecategories": {
+      "post": {
+        "tags": [
+          "ClearCache"
+        ],
+        "summary": "Limpa caches de acordo com as categorias passadas.",
+        "description": "Exemplos:\r\n            \r\n    {\r\n       \"View\": 4,\r\n    }\r\n    \r\n    ou múltiplas categorias:\r\n    \r\n    {\r\n       \"View\": 4,\r\n       \"Filter\": 256\r\n    }",
+        "operationId": "ClearCache_ClearCacheCategories",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "categories",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Represents a HTTP response message.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/comarcas/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Comarcas"
+        ],
+        "summary": "Buscar Comarcas",
+        "operationId": "Comarcas_BuscarComarca",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Compra": {
+      "get": {
+        "tags": [
+          "Compra"
+        ],
+        "operationId": "Compra_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/ConsultasExportadas/Arquivos/{nomeConsulta}": {
+      "get": {
+        "tags": [
+          "ConsultasExportadas"
+        ],
+        "summary": "Busca um arquivo csv de fonte de dados conforme o nome informado.",
+        "operationId": "ConsultasExportadas_GetConsulta",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nomeConsulta",
+            "in": "path",
+            "description": "Request para obter arquivo csv conforme o nome informado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Represents a HTTP response message.",
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/ContratadoApontado": {
+      "get": {
+        "tags": [
+          "ContratadoApontado"
+        ],
+        "operationId": "ContratadoApontado_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contrato/{handle}/envioaprovacao": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Comando para Enviar um Contrato para Aprovação",
+        "operationId": "Contratos_EnviarContratoAprovacao",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contrato/{handleContrato}/aditivo/{handleAditivo}/envioaprovacao": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Comando para Enviar um Aditivo para Aprovação",
+        "operationId": "Contratos_EnviarAditivoAprovacao",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handleContrato",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "handleAditivo",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Contratos",
+        "operationId": "Contratos_RetornarContratos",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contrato": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Inserir um Novo Contrato",
+        "operationId": "Contratos_CriarContrato",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contrato/{handle}": {
+      "put": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Editar um Contrato Já Existente",
+        "operationId": "Contratos_AtualizarContrato",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Excluir um Contrato Existente",
+        "operationId": "Contratos_ExcluirContrato",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/aditivos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Aditivos",
+        "operationId": "Contratos_BuscarAditivo",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/aditivo": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Inserir um Aditivo a um Contrato",
+        "operationId": "Contratos_CriarAditivo",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/aditivo/{handle}": {
+      "put": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Editar um Aditivo Já Existente",
+        "operationId": "Contratos_AtualizarAditivo",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Excluir um Aditivo Existente",
+        "operationId": "Contratos_ExcluirAditivo",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/documentos": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Documentos de Contratos ou Aditivos",
+        "operationId": "Contratos_BuscarDocumentos",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/documento": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Inserir Documento em um Contrato ou Aditivo",
+        "operationId": "Contratos_InserirDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/documento/{handle}": {
+      "put": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Editar Documento de um Contrato ou Aditivo",
+        "operationId": "Contratos_EditarDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Excluir Documento de um Contrato ou Aditivo",
+        "operationId": "Contratos_ExcluirDocumento",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/minutas/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Minuta para o Contrato",
+        "operationId": "Contratos_BuscarMinuta",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/alcadas/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Alçada para o Contrato",
+        "operationId": "Contratos_BuscarAlcada",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/classificacoes/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Classificação para o Contrato",
+        "operationId": "Contratos_BuscarClassificacao",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/motivosrelevancia/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Motivo de Relevância para o Contrato",
+        "operationId": "Contratos_BuscarMotivoRelevancia",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/motivosencerramento/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Motivo de Encerramento para o Contrato",
+        "operationId": "Contratos_BuscarMotivoEncerramento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/contratos/motivosreativacao/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Contratos"
+        ],
+        "summary": "Buscar Motivo de Reativação para o Contrato",
+        "operationId": "Contratos_BuscarMotivoReativacao",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/CreateURL/GetUrlEmpresa": {
+      "get": {
+        "tags": [
+          "CreateURL"
+        ],
+        "operationId": "CreateURL_GetUrlEmpresa",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/CreateURL/GetUrlInstalacao": {
+      "get": {
+        "tags": [
+          "CreateURL"
+        ],
+        "operationId": "CreateURL_GetUrlInstalacao",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/CreateURL": {
+      "get": {
+        "tags": [
+          "CreateURL"
+        ],
+        "operationId": "CreateURL_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/datasources": {
+      "get": {
+        "tags": [
+          "DataSources"
+        ],
+        "summary": "Lista consultas disponíveis no sistema",
+        "operationId": "DataSources_GetDataSources",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/datasources/{id}/metadata": {
+      "get": {
+        "tags": [
+          "DataSources"
+        ],
+        "summary": "Vistualiza o metadado da consulta",
+        "operationId": "DataSources_GetMetadata",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificação da consulta",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/datasources/{id}": {
+      "get": {
+        "tags": [
+          "DataSources"
+        ],
+        "summary": "Executa a consulta e retorna os dados",
+        "operationId": "DataSources_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Indentificação da consulta",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startIndex",
+            "in": "query",
+            "description": "índice inicial da pagínação",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "description": "número de registros que devem ser retornados",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/departamentos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Departamentos"
+        ],
+        "summary": "Buscar Departamentos",
+        "operationId": "Departamentos_BuscarDepartamento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/DesmontaInformacoesGuia": {
+      "get": {
+        "tags": [
+          "DesmontaInformacoesGuia"
+        ],
+        "operationId": "DesmontaInformacoesGuia_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "additionalProperties": {
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "xml": {
+                "name": "Dictionary`2",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/divisoes/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Divisoes"
+        ],
+        "summary": "Buscar Divisões",
+        "operationId": "Divisoes_BuscarDivisao",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/filiais/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Filiais"
+        ],
+        "summary": "Buscar Filiais",
+        "operationId": "Filiais_BuscarFilial",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/filiais/unidades/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Filiais"
+        ],
+        "summary": "Buscar Unidades de uma Filial",
+        "operationId": "Filiais_BuscarUnidadeFilial",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/FiltroPessoas": {
+      "post": {
+        "tags": [
+          "FiltroPessoas"
+        ],
+        "operationId": "FiltroPessoas_Post",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/Groups": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Obtém listagem de grupos da base de dados.\r\nVisão: Z_GRUPOS.REST.GRID",
+        "operationId": "Groups_GetGroups",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startIndex",
+            "in": "query",
+            "description": "Índice de início para consultas paginadas.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "description": "Quantidade de registros a serem retornados (default = 10).",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 10
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Campo de ordenação (deve pertencer à visão).",
+            "required": false,
+            "type": "string",
+            "default": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Cria um novo grupo na base de dados.\r\nVisão: Z_GRUPOS.REST.FORM",
+        "operationId": "Groups_NewGroup",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "group",
+            "in": "body",
+            "description": "Grupo a ser criado.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Groups/{groupName}": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Obtém detalhes de um grupo específico.\r\nVisão: Z_GRUPOS.REST.FORM",
+        "operationId": "Groups_GetGroup",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Nome do grupo a ser consultado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Atualiza um grupo na base de dados.\r\nVisão: Z_GRUPOS.REST.FORM",
+        "operationId": "Groups_AlterGroup",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Nome do grupo a ser atualizado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "group",
+            "in": "body",
+            "description": "Grupo com os valores a serem atualziados.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/InfoCombosDocumentosLote": {
+      "get": {
+        "tags": [
+          "InfoCombosDocumentosLote"
+        ],
+        "operationId": "InfoCombosDocumentosLote_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/JuridicoAssistente": {
+      "get": {
+        "tags": [
+          "JuridicoAssistant"
+        ],
+        "operationId": "JuridicoAssistant_GetInformacoesDetalhadasPasta",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request.action",
+            "in": "query",
+            "description": "Nome da ação à qual o objeto de request será enviado.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "request.parameters",
+            "in": "query",
+            "description": "Parâmetros da requisição, recebidos como dynamic, de acordo com o definido na plataforma de assistente virtual.",
+            "required": false,
+            "type": "object"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "JuridicoAssistant"
+        ],
+        "operationId": "JuridicoAssistant_AcessoAgendaToPasta",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/lgpd/personal_report/{document}": {
+      "get": {
+        "tags": [
+          "LGPD"
+        ],
+        "summary": "Emite relatório de informações pessoais para determinado titular",
+        "operationId": "LGPD_GetPersonalDataReport",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "document",
+            "in": "path",
+            "description": "Documento do titular",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/lgpd/mapping_report": {
+      "get": {
+        "tags": [
+          "LGPD"
+        ],
+        "summary": "Emite relatório de mapeamento de dados",
+        "operationId": "LGPD_GetMappingReport",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/lgpd/anonymize": {
+      "post": {
+        "tags": [
+          "LGPD"
+        ],
+        "summary": "Dispara a anonimização de todos os registros do titular identificado pelo documento. Essa operação altera dados de forma irreversível.",
+        "operationId": "LGPD_AnonymizeByDocument",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "document",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/LoteDocumentos/GetTipoDocumentoSearchContext": {
+      "get": {
+        "tags": [
+          "LoteDocumentos"
+        ],
+        "operationId": "LoteDocumentos_GetTipoDocumentoSearchContext",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/LoteDocumentos/GetPastaVirtualSearchContext": {
+      "get": {
+        "tags": [
+          "LoteDocumentos"
+        ],
+        "operationId": "LoteDocumentos_GetPastaVirtualSearchContext",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/LoteDocumentos": {
+      "get": {
+        "tags": [
+          "LoteDocumentos"
+        ],
+        "operationId": "LoteDocumentos_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/moedas/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Moedas"
+        ],
+        "summary": "Buscar Moedas",
+        "operationId": "Moedas_BuscarMoeda",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/MonitoramentoStatus/GetUltimoMonitoramentoStatus": {
+      "get": {
+        "tags": [
+          "Monitoramento"
+        ],
+        "operationId": "Monitoramento_GetUltimoMonitoramentoStatus",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/MontaInformacoesGuia": {
+      "get": {
+        "tags": [
+          "MontaInformacoesGuia"
+        ],
+        "operationId": "MontaInformacoesGuia_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/MontaUrlAnexarDocumentos": {
+      "get": {
+        "tags": [
+          "MontaUrlAnexarDocumentos"
+        ],
+        "operationId": "MontaUrlAnexarDocumentos_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/MontaUrlInformacoesGuia": {
+      "get": {
+        "tags": [
+          "MontaUrlInformacoesGuia"
+        ],
+        "operationId": "MontaUrlInformacoesGuia_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/MontaUrlParticipante": {
+      "get": {
+        "tags": [
+          "MontaUrlParticipante"
+        ],
+        "operationId": "MontaUrlParticipante_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tipoSolicitacao",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "handleSolicitacao",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/NIP/CPF={CPF}/ListarNips": {
+      "get": {
+        "tags": [
+          "NIP"
+        ],
+        "summary": "API para consulta de NIPs vinculadas a um beneficiário.",
+        "operationId": "NIP_GetNipsBeneficiario",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "CPF",
+            "in": "path",
+            "description": "CPF do Beneficiário (com ou sem máscara)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.ResponseConsultaNIP"
+              },
+              "xml": {
+                "name": "ResponseConsultaNIP",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound"
+          }
+        }
+      }
+    },
+    "/api/NIP/DataAndamento={DataAndamento}/ListarNips": {
+      "get": {
+        "tags": [
+          "NIP"
+        ],
+        "summary": "API para consulta de NIPs que possuem andamentos a partir de uma data (Data do andamento na ANS).",
+        "operationId": "NIP_GetNipsDataAndamento",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "DataAndamento",
+            "in": "path",
+            "description": "Data de início dos andamentos (AAAA-MM-DD)",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.ResponseConsultaNIP"
+              },
+              "xml": {
+                "name": "ResponseConsultaNIP",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound"
+          }
+        }
+      }
+    },
+    "/api/NIP/DataCadastroAndamento={DataCadastroAndamento}/ListarNips": {
+      "get": {
+        "tags": [
+          "NIP"
+        ],
+        "summary": "API para consulta de NIPs que possuem andamentos cadastrados no sistema a partir de uma data (Data de inclusão no sistema).",
+        "operationId": "NIP_GetNipsDataCadastroAndamento",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "DataCadastroAndamento",
+            "in": "path",
+            "description": "Data de início das inclusões dos andamentos (AAAA-MM-DD)",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.ResponseConsultaNIP"
+              },
+              "xml": {
+                "name": "ResponseConsultaNIP",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound"
+          }
+        }
+      }
+    },
+    "/api/NIP/GetResumoNips": {
+      "get": {
+        "tags": [
+          "NIP"
+        ],
+        "summary": "Busca uma versão resumida da situação atual de NIPs que sofreram alguma alteração no período especificado (Data de alteração).",
+        "operationId": "NIP_GetResumoNipsDataAlteracao",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "DataInicial",
+            "in": "query",
+            "description": "Data de início das alterações em NIPs (AAAA-MM-DD)",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "DataFinal",
+            "in": "query",
+            "description": "Data final das alterações em NIPs (AAAA-MM-DD)",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.ResponseResumoNIP"
+              },
+              "xml": {
+                "name": "ResponseResumoNIP",
+                "wrapped": true
+              },
+              "type": "array"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/jur/parecer/{handle}/envioaprovacao": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Comando para Enviar o Parecer para Aprovação",
+        "operationId": "Pareceres_EnviarAprovacao",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Buscar Pareceres",
+        "operationId": "Pareceres_RetornarPareceres",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/parecer": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Inserir um Novo Parecer",
+        "operationId": "Pareceres_CriarParecer",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/parecer/{handle}": {
+      "put": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Editar um Parecer",
+        "operationId": "Pareceres_AtualizarParecer",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Excluir um Parecer Existente",
+        "operationId": "Pareceres_ExcluirParecer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/autores/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Buscar Outros Autores de um Parecer",
+        "operationId": "Pareceres_RetornarOutrosAutores",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/autor": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Inserir Outro Autor no Parecer",
+        "operationId": "Pareceres_CriarOutroAutor",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/autor/{handle}": {
+      "put": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Editar um Autor do Parecer",
+        "operationId": "Pareceres_AtualizarAutor",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Excluir Autor de um Parecer",
+        "operationId": "Pareceres_ExcluirAutorParecer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/documentos": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Buscar Documentos",
+        "operationId": "Pareceres_BuscarDocumentos",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/documento": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Inserir Documento em um Parecer",
+        "operationId": "Pareceres_InserirDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/documento/{handle}": {
+      "put": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Editar Documento de um Parecer",
+        "operationId": "Pareceres_EditarDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Excluir Documento de um Parecer",
+        "operationId": "Pareceres_ExcluirDocumento",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/assuntos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Buscar Assunto Pré-Definido para o Parecer",
+        "operationId": "Pareceres_BuscarAssunto",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pareceres/projetos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Pareceres"
+        ],
+        "summary": "Buscar Projeto para Associar ao Parecer",
+        "operationId": "Pareceres_BuscarProjeto",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Pessoas": {
+      "post": {
+        "tags": [
+          "Pessoas"
+        ],
+        "summary": "Retorna uma lista de pessoas.\r\nVisão: GN_PESSOAS_REST.CUSTOM.GRID.",
+        "description": "Exemplo de requisição:\r\n            \r\n    {\r\n       \"cpfnumero\": \"999.999.999-99\"\r\n    }",
+        "operationId": "Pessoas_RetornaPessoas",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Pessoa": {
+      "put": {
+        "tags": [
+          "Pessoas"
+        ],
+        "summary": "Faz a alteração de pessoas Visão: GN_PESSOAS_REST.FORM.",
+        "description": "Exemplo de requisição:\r\n            \r\n    {\r\n       \"email\": \"email.pessoa@xxx.com.br\"\r\n    }",
+        "operationId": "Pessoas_AtualizaPessoa",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "cpfCnpj",
+            "in": "query",
+            "description": "Documento da pessoa (CPF ou CNPJ).",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "people",
+            "in": "body",
+            "description": "Entidade Pessoas.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pessoas"
+        ],
+        "summary": "Faz a gravação de uma nova pessoa Visão: GN_PESSOAS.REST.FORM.",
+        "description": "Exemplo de requisição:\r\n            \r\n    {\r\n       \"classificacaojuiz\": \"True\"\r\n    }",
+        "operationId": "Pessoas_CadastraPessoa",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "people",
+            "in": "body",
+            "description": "Entidade Pessoas.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pessoas"
+        ],
+        "summary": "Remove uma pessoa.",
+        "operationId": "Pessoas_ExcluiPessoa",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "cpfCnpj",
+            "in": "query",
+            "description": "Documento da pessoa (CPF ou CNPJ).",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pastas/documentos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "ProcessoDocumentos"
+        ],
+        "summary": "Buscar Documentos",
+        "operationId": "ProcessoDocumentos_BuscarDocumentos",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pastas/documento": {
+      "post": {
+        "tags": [
+          "ProcessoDocumentos"
+        ],
+        "summary": "Inserir Documento em um Processo",
+        "operationId": "ProcessoDocumentos_InserirDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pastas/documento/{handle}": {
+      "put": {
+        "tags": [
+          "ProcessoDocumentos"
+        ],
+        "summary": "Editar Documento de um Processo",
+        "operationId": "ProcessoDocumentos_EditarDocumento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProcessoDocumentos"
+        ],
+        "summary": "Excluir Documento de um Processo",
+        "operationId": "ProcessoDocumentos_ExcluirDocumento",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/pastas/desdobramentos/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Processos"
+        ],
+        "summary": "Buscar Desdobramentos",
+        "operationId": "Processos_BuscarDesdobramento",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jur/procuracoes/{startRowIndex}/{maximumRows}/{orderBy}": {
+      "post": {
+        "tags": [
+          "Procuracoes"
+        ],
+        "summary": "Buscar Procurações",
+        "operationId": "Procuracoes_BuscarProcuracao",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startRowIndex",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "maximumRows",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "orderBy",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/ResultFields": {
+      "post": {
+        "tags": [
+          "ResultFields"
+        ],
+        "operationId": "ResultFields_Post",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "args",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/Roles": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Obtém listagem de papéis da base de dados.\r\nVisão: Z_PAPEIS.REST.GRID",
+        "operationId": "Roles_GetRoles",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startIndex",
+            "in": "query",
+            "description": "Índice de início para consultas paginadas.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "description": "Quantidade de registros a serem retornados (default = 10).",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 10
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Campo de ordenação (deve pertencer à visão).",
+            "required": false,
+            "type": "string",
+            "default": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Cria um novo papel na base de dados.\r\nVisão: Z_PAPEIS.REST.FORM",
+        "operationId": "Roles_NewRole",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "role",
+            "in": "body",
+            "description": "Papel a ser criado.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Roles/{roleName}": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Obtém detalhes de um papel específico.\r\nVisão: Z_PAPEIS.REST.FORM",
+        "operationId": "Roles_GetRole",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "roleName",
+            "in": "path",
+            "description": "Nome do papel a ser consultado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Atualiza um papel na base de dados.\r\nVisão: Z_PAPEIS.REST.FORM",
+        "operationId": "Roles_AlterRole",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "roleName",
+            "in": "path",
+            "description": "Nome do papel a ser atualizado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "in": "body",
+            "description": "Papel com os valores a serem atualizados.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/ToolTip": {
+      "get": {
+        "tags": [
+          "ToolTip"
+        ],
+        "operationId": "ToolTip_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém lista de usuários da base de dados.\r\nVisão: Z_GRUPOUSUARIOS.REST.GRID",
+        "operationId": "Users_GetUsers",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "startIndex",
+            "in": "query",
+            "description": "Índice de início para consultas paginadas.",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "description": "Quantidade de registros a serem retornados (default = 10).",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 10
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "description": "Campo de ordenação (deve pertencer à visão).",
+            "required": false,
+            "type": "string",
+            "default": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cria um novo usuário na base de dados.\r\nVisão: Z_GRUPOUSUARIOS.REST.FORM",
+        "operationId": "Users_NewUser",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Usuário a ser criado.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém detalhes de um usuário específico.\r\nVisão: Z_GRUPOUSUARIOS.REST.FORM",
+        "operationId": "Users_GetUser",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ser consultado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza um usuário na base de dados.\r\nVisão: Z_GRUPOUSUARIOS.REST.FORM",
+        "operationId": "Users_EditUser",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ser atualizado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Usuário com os valores a serem atualizado.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Groups": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém listagem dos grupos vinculados a um usuário.\r\nVisão: Z_GRUPOUSUARIOGRUPOS.REST.GRID",
+        "operationId": "Users_GetUserGroups",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter os grupos consultados.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adiciona vínculo de grupo a usuário.\r\nVisão: Z_GRUPOUSUARIOGRUPOS.REST.FORM",
+        "operationId": "Users_NewGroup",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter grupo vinculado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "group",
+            "in": "body",
+            "description": "Grupo a ser vinculado ao usuário.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Groups/{groupName}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém detalhes de um grupo vinculado a usuário.\r\nVisão: Z_GRUPOS.REST.FORM",
+        "operationId": "Users_GetUserGroup",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter o grupo consultado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Nome do grupo a ser consultado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Exclui um vínculo de grupo de um usuário.",
+        "operationId": "Users_DeleteUserGroup",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter vínculo a grupo excluído.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "groupName",
+            "in": "path",
+            "description": "Nome do grupo a ser desvinculado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Roles": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém listagem de papéis vinculados a um usuário.\r\nVisão: Z_PAPELATRIBUICOES.REST.GRID",
+        "operationId": "Users_GetRoles",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter os papéis consultados.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adiciona vínculo de papel a usuário.\r\nVisão: Z_PAPELATRIBUICOES.REST.FORM",
+        "operationId": "Users_NewRole",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter papel vinculado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "in": "body",
+            "description": "Papel a ser vinculado ao usuário.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Roles/{roleName}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém detalhes de um papel vinculado a usuário.\r\nVisão: Z_PAPEIS.REST.FORM",
+        "operationId": "Users_GetRole",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter o papel consultado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "roleName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Excluí vínculo de um papel de um usuário.",
+        "operationId": "Users_DeleteRole",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter papel desvinculado.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "roleName",
+            "in": "path",
+            "description": "Nome do papel a ser desvinculado.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Companies": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém listagem de empresas vinculadas à um usuário.\r\nVisão: Z_GRUPOUSUARIOEMPRESAS.REST.GRID",
+        "operationId": "Users_GetUserCompanies",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter as empresas consultadas.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adiciona vínculo de empresa a usuário.\r\nVisão: Z_GRUPOUSUARIOEMPRESAS.REST.FORM",
+        "operationId": "Users_NewUserCompany",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter empresa vinculada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userCompany",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Companies/{cnpj}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém detalhes de uma empresa vinculada a usuário.\r\nVisão: EMPRESAS.FORM (ou visão respectiva de tabela de empresas do sistema).",
+        "operationId": "Users_GetUserCompany",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter a empresa consultada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cnpj",
+            "in": "path",
+            "description": "CNPJ da empresa a ser consultada.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Excluí vínculo de uma empresa de um usuário.",
+        "operationId": "Users_DeleteUserCompany",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter empresa desvinculada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cnpj",
+            "in": "path",
+            "description": "CNPJ da empresa a ser desvinculada.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Companies/{companyCnpj}/Branches": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém listagem de filiais de empresa vinculadas à um usuário.\r\nVisão: Z_GRUPOUSUARIOEMPRESAFILIAIS.REST.GRID",
+        "operationId": "Users_GetUserBranches",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter as filiais consultadas.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyCnpj",
+            "in": "path",
+            "description": "CNPJ da empresa a ter filiais consultadas.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Adiciona vínculo de filial à empresa de usuário.\r\nVisão: Z_GRUPOUSUARIOEMPRESAFILIAIS.REST.FORM",
+        "operationId": "Users_NewUserBranch",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/x-www-form-urlencoded",
+          "text/xml",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter filial vinculada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyCnpj",
+            "in": "path",
+            "description": "CNPJ da empresa à qual a filial pertence.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "branch",
+            "in": "body",
+            "description": "Filial a ser vinculada ao usuário.",
+            "required": true,
+            "schema": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{nickname}/Companies/{companyCnpj}/Branches/{branchCnpj}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Obtém detalhes de uma filial vinculada a usuário.\r\nVisão: FILIAIS.FORM (ou visão respectiva de tabela de filiais do sistema).",
+        "operationId": "Users_GetUserBranch",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter a filial consultada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyCnpj",
+            "in": "path",
+            "description": "CNPJ da empresa a ter filial consultada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "branchCnpj",
+            "in": "path",
+            "description": "CNPJ da filial a ser consultada.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Excluí vínculo de filial de uma empresa de um usuário.",
+        "operationId": "Users_DeleteUserBranch",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "nickname",
+            "in": "path",
+            "description": "Apelido do usuário a ter a filial desvinculada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "companyCnpj",
+            "in": "path",
+            "description": "CNPJ da empresa a ter filial desvinculada.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "branchCnpj",
+            "in": "path",
+            "description": "CNPJ da filial a ser desvinculada.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "description": "Defines a command that asynchronously creates an {System.Net.Http.HttpResponseMessage}.",
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/VerificaCamposGuia": {
+      "get": {
+        "tags": [
+          "VerificaCamposGuia"
+        ],
+        "operationId": "VerificaCamposGuia_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "text/xml",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/app_services/auth.oauth2.svc/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "API para fornecer um token de autenticação compatível com o fluxo 'Resource Owner Password' do OAuth2",
+        "description": "O token pode ser utilizado nas demais APIs que exigem autenticação, sendo enviado através do header HTTP Authorization, cujo valor deve ter o prefixo 'Bearer '",
+        "operationId": "OAuth2TokenPost",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "description": "o login do usuário",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "description": "a senha do usuário",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "grant_type",
+            "in": "formData",
+            "description": "o tipo de permissão, passar fixo 'password'",
+            "required": true,
+            "type": "string",
+            "default": "password"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                },
+                "refresh_token": {
+                  "type": "string"
+                },
+                "token_type": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "expires_in": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/app_services/auth.oauth2.svc/revoke_token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "API para revogar um token de autenticação",
+        "description": "O token uma vez revogado não poderá ser reativado, devendo ser descartado",
+        "operationId": "OAuth2RevokeTokenPost",
+        "consumes": [
+          "application/x-www-form-url-encoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "formData",
+            "description": "o token que a ser revogado",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "properties": {},
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ListaAcessosResponse": {
+      "properties": {
+        "mensagens": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "niveis": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.Nivel"
+          },
+          "xml": {
+            "name": "Nivel",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "itens": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "ListaAcessosResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.Nivel": {
+      "properties": {
+        "codigoNivel": {
+          "type": "string"
+        },
+        "codigoPadraoValorItem": {
+          "type": "object"
+        },
+        "nomeNivel": {
+          "type": "string"
+        },
+        "obrigatoriedade": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ordem": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "valoracao": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "situacao": {
+          "type": "string"
+        },
+        "valorNivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelList"
+          },
+          "xml": {
+            "name": "ValorNivelList",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "valorPadrao": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "xml": {
+        "name": "Nivel"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelList": {
+      "properties": {
+        "codigoValorNivel": {
+          "type": "string"
+        },
+        "nomeValorNivel": {
+          "type": "string"
+        },
+        "codigoValorNivelPai": {
+          "type": "string"
+        },
+        "tipoHierarquia": {
+          "type": "string"
+        },
+        "ocultarValorNivel": {
+          "type": "string"
+        },
+        "tipoValorNivel": {
+          "type": "object"
+        }
+      },
+      "xml": {
+        "name": "ValorNivelList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.AcessoUsuarioResponse": {
+      "properties": {
+        "mensagens": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.MensagemRetorno"
+          },
+          "xml": {
+            "name": "MensagemRetorno",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "usuario": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.UsuarioAcesso"
+        }
+      },
+      "xml": {
+        "name": "AcessoUsuarioResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.MensagemRetorno": {
+      "properties": {
+        "Codigo": {
+          "type": "string"
+        },
+        "Descricao": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "MensagemRetorno"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.UsuarioAcesso": {
+      "properties": {
+        "chave": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "funcao": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "imovel": {
+          "type": "string"
+        },
+        "nomeGestor": {
+          "type": "string"
+        },
+        "chaveGestor": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "nivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.NivelUsuList"
+          },
+          "xml": {
+            "name": "NivelUsuList",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "itemList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ItenUsu"
+          },
+          "xml": {
+            "name": "ItenUsu",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "UsuarioAcesso"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.NivelUsuList": {
+      "properties": {
+        "codigoNivel": {
+          "type": "string"
+        },
+        "nomeNivel": {
+          "type": "string"
+        },
+        "obrigatoriedade": {
+          "type": "string"
+        },
+        "valoracao": {
+          "type": "string"
+        },
+        "ordem": {
+          "type": "string"
+        },
+        "codigoPadraoValorNivel": {
+          "type": "string"
+        },
+        "nomeValorPadrao": {
+          "type": "string"
+        },
+        "valorNivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelUsuList"
+          },
+          "xml": {
+            "name": "ValorNivelUsuList",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "NivelUsuList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ItenUsu": {
+      "properties": {
+        "codigoItem": {
+          "type": "string"
+        },
+        "nomeItem": {
+          "type": "string"
+        },
+        "obrigatoriedade": {
+          "type": "string"
+        },
+        "valoracao": {
+          "type": "string"
+        },
+        "codigoPadraoValorItem": {
+          "type": "string"
+        },
+        "nomeValorPadrao": {
+          "type": "string"
+        },
+        "valorItemList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValorItemUsuList"
+          },
+          "xml": {
+            "name": "ValorItemUsuList",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "ItenUsu"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelUsuList": {
+      "properties": {
+        "codigoValorNivel": {
+          "type": "string"
+        },
+        "nomeValorNivel": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ValorNivelUsuList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValorItemUsuList": {
+      "properties": {
+        "codigoValorItem": {
+          "type": "string"
+        },
+        "nomeValorItem": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ValorItemUsuList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.AcessoTodosUsuariosResponse": {
+      "properties": {
+        "mensagens": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.MensagemRetorno"
+          },
+          "xml": {
+            "name": "MensagemRetorno",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "usuarios": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.UsuarioAcesso"
+          },
+          "xml": {
+            "name": "UsuarioAcesso",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "AcessoTodosUsuariosResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.Root": {
+      "properties": {
+        "usuario": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.Usuario"
+        }
+      },
+      "xml": {
+        "name": "Root"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.Usuario": {
+      "properties": {
+        "chave": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "funcao": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "imovel": {
+          "type": "string"
+        },
+        "nomeGestor": {
+          "type": "string"
+        },
+        "chaveGestor": {
+          "type": "string"
+        },
+        "telefone": {
+          "type": "string"
+        },
+        "dataVigenciaAcessoInicio": {
+          "type": "string"
+        },
+        "dataVigenciaAcessoFim": {
+          "type": "string"
+        },
+        "itemList": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "nivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.NivelList"
+          },
+          "xml": {
+            "name": "NivelList",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "Usuario"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.NivelList": {
+      "properties": {
+        "codigoNivel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "codigoPadraoValorItem": {
+          "type": "object"
+        },
+        "nomeNivel": {
+          "type": "string"
+        },
+        "obrigatoriedade": {
+          "type": "object"
+        },
+        "ordem": {
+          "type": "object"
+        },
+        "valoracao": {
+          "type": "object"
+        },
+        "situacao": {
+          "type": "string"
+        },
+        "valorNivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.ValorNivelList"
+          },
+          "xml": {
+            "name": "ValorNivelList",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "valorPadrao": {
+          "type": "object"
+        }
+      },
+      "xml": {
+        "name": "NivelList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.CastRequest.ValorNivelList": {
+      "properties": {
+        "codigoValorNivel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nomeValorNivel": {
+          "type": "string"
+        },
+        "codigoValorNivelPai": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ocultarValorNivel": {
+          "type": "boolean"
+        },
+        "tipoValorNivel": {
+          "type": "object"
+        }
+      },
+      "xml": {
+        "name": "ValorNivelList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.CastResponse": {
+      "properties": {
+        "listretornoAcesso": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ListretornoAcesso"
+          },
+          "xml": {
+            "name": "ListretornoAcesso",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "mensagens": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.Mensagen"
+          },
+          "xml": {
+            "name": "Mensagen",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "retornoPedido": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.RetornoPedido"
+        }
+      },
+      "xml": {
+        "name": "CastResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ListretornoAcesso": {
+      "properties": {
+        "codigoNivel": {
+          "type": "string"
+        },
+        "codigoPerfil": {
+          "type": "string"
+        },
+        "descricaoRetornoAcesso": {
+          "type": "string"
+        },
+        "motivo": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ListretornoAcesso"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.Mensagen": {
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "descricao": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Mensagen"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.RetornoPedido": {
+      "properties": {
+        "codigoRetornoPedido": {
+          "type": "string"
+        },
+        "descricaoRetornoPedido": {
+          "type": "string"
+        },
+        "motivo": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "RetornoPedido"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValidaAcessoResponse": {
+      "properties": {
+        "Status": {
+          "type": "string"
+        },
+        "codigoRetornoPedido": {
+          "type": "string"
+        },
+        "mensagens": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.MensagemRetorno"
+          },
+          "xml": {
+            "name": "MensagemRetorno",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "ValidaAcessoResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.RemoverAcessoRequest.Root": {
+      "properties": {
+        "usuario": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.Usuario"
+        },
+        "nivel": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.NivelRemover"
+        },
+        "item": {
+          "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ItemRemover"
+        }
+      },
+      "xml": {
+        "name": "Root"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.Usuario": {
+      "properties": {
+        "chave": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Usuario"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.NivelRemover": {
+      "properties": {
+        "codigoNivel": {
+          "type": "string"
+        },
+        "nomeNivel": {
+          "type": "string"
+        },
+        "valorNivelList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelRemoverList"
+          },
+          "xml": {
+            "name": "ValorNivelRemoverList",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "NivelRemover"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ItemRemover": {
+      "properties": {
+        "codigoItem": {
+          "type": "string"
+        },
+        "nomeItem": {
+          "type": "string"
+        },
+        "valorItemList": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.Transpetro.DataContracts.Cast.ValorItemRemoverList"
+          },
+          "xml": {
+            "name": "ValorItemRemoverList",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "ItemRemover"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValorNivelRemoverList": {
+      "properties": {
+        "codigoValorNivel": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ValorNivelRemoverList"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.Transpetro.DataContracts.Cast.ValorItemRemoverList": {
+      "properties": {
+        "codigoValorNivel": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ValorItemRemoverList"
+      },
+      "type": "object"
+    },
+    "Controllers.Api.ClassificacaoController.Registro": {
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "data": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "xml": {
+        "name": "Registro"
+      },
+      "type": "object"
+    },
+    "Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantRequest": {
+      "description": "Objeto de requisição para métodos de VirtualAssistantController.",
+      "properties": {
+        "Action": {
+          "description": "Nome da ação à qual o objeto de request será enviado.",
+          "type": "string"
+        },
+        "Parameters": {
+          "description": "Parâmetros da requisição, recebidos como dynamic, de acordo com o definido na plataforma de assistente virtual.",
+          "type": "object"
+        }
+      },
+      "xml": {
+        "name": "VirtualAssistantRequest"
+      },
+      "type": "object"
+    },
+    "Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantResponse": {
+      "description": "Objeto de resposta a ser enviado por um VirtualAssistantController à plataforma de assistente virtual.",
+      "properties": {
+        "fulfillmentMessages": {
+          "items": {
+            "$ref": "#/definitions/Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantFulfillmentMessage"
+          },
+          "xml": {
+            "name": "VirtualAssistantFulfillmentMessage",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "source": {
+          "description": "Origem dos dados.\r\nPode-se atribuir o nome do produto ou do sistema.\r\nValor padrão: Benner.",
+          "type": "string"
+        },
+        "outputContexts": {
+          "description": "Lista de objetos de contexto de saída.",
+          "items": {
+            "$ref": "#/definitions/Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantOutputContext"
+          },
+          "xml": {
+            "name": "VirtualAssistantOutputContext",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "VirtualAssistantResponse"
+      },
+      "type": "object"
+    },
+    "Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantFulfillmentMessage": {
+      "description": "Objeto contendo uma mensagem de retorno do Assistente Virtual.",
+      "properties": {
+        "platform": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "VirtualAssistantFulfillmentMessage"
+      },
+      "type": "object"
+    },
+    "Benner.Tecnologia.Wes.Components.VirtualAssistant.VirtualAssistantOutputContext": {
+      "description": "Objeto de contexto de saída a ser atribuído ao response de métodos de controller de Assistente Virtual.",
+      "properties": {
+        "name": {
+          "description": "Nome do objeto de contexto de saída.",
+          "type": "string"
+        },
+        "lifespanCount": {
+          "description": "Quantidade de requisições em que o objeto de contexto de saída continuará disponível na plataforma de Assistente Virtual.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "parameters": {
+          "description": "Parâmetros do objeto de contexto de saída.\r\nDeve ser construído como um objeto anônimo:\r\nParameters = new { chave = valor };",
+          "type": "object"
+        }
+      },
+      "xml": {
+        "name": "VirtualAssistantOutputContext"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.WebApp.API.NIP.Response.ResponseConsultaNIP": {
+      "properties": {
+        "NumeroDemanda": {
+          "description": "Número da demanda",
+          "type": "string"
+        },
+        "ProtocoloANS": {
+          "description": "Protocolo ANS",
+          "type": "string"
+        },
+        "SituacaoAtual": {
+          "description": "Situação atual da NIP",
+          "type": "string"
+        },
+        "DataSituacaoAtual": {
+          "description": "Data da situação atual",
+          "type": "string",
+          "format": "date-time"
+        },
+        "Andamentos": {
+          "description": "Lista dos Andamentos da NIP",
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.NIPAndamento"
+          },
+          "xml": {
+            "name": "NIPAndamento",
+            "wrapped": true
+          },
+          "type": "array"
+        },
+        "Beneficiarios": {
+          "items": {
+            "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.NIPBeneficiario"
+          },
+          "xml": {
+            "name": "NIPBeneficiario",
+            "wrapped": true
+          },
+          "type": "array"
+        }
+      },
+      "xml": {
+        "name": "ResponseConsultaNIP"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.WebApp.API.NIP.Response.NIPAndamento": {
+      "properties": {
+        "Data": {
+          "description": "Data do andamento",
+          "type": "string",
+          "format": "date-time"
+        },
+        "Andamento": {
+          "description": "Descrição do andamento",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "NIPAndamento"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.WebApp.API.NIP.Response.NIPBeneficiario": {
+      "properties": {
+        "Nome": {
+          "description": "Nome do Beneficiário",
+          "type": "string"
+        },
+        "CPF": {
+          "description": "CPF do beneficiário",
+          "type": "string"
+        },
+        "Condicao": {
+          "description": "Condição do Beneficiário",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "NIPBeneficiario"
+      },
+      "type": "object"
+    },
+    "Benner.Juridico.WebApp.API.NIP.Response.ResponseResumoNIP": {
+      "properties": {
+        "DadosBeneficiario": {
+          "$ref": "#/definitions/Benner.Juridico.WebApp.API.NIP.Response.NIPBeneficiario",
+          "description": "Dados do beneficiário"
+        },
+        "DataNotificacao": {
+          "description": "Data e hora de abertura da NIP junto a ANS (data da notificação)",
+          "type": "string"
+        },
+        "ObjetoReclamacao": {
+          "description": "Objeto da reclamação selecionada",
+          "type": "string"
+        },
+        "AndamentoSituacaoAtual": {
+          "description": "Andamento (situação atual)",
+          "type": "string"
+        },
+        "IdProtocoloNip": {
+          "description": "ID único do protocolo Nip",
+          "type": "string"
+        },
+        "UrlProtocoloNip": {
+          "description": "URL do protocolo Nip no Benner",
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "ResponseResumoNIP"
+      },
+      "type": "object"
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "description": "Autenticação pelo fluxo Resource Owner Password do OAuth2, tal como a especificação: https://oauthlib.readthedocs.io/en/stable/oauth2/grants/password.html",
+      "flow": "password",
+      "tokenUrl": "../../app_services/auth.oauth2.svc/token",
+      "scopes": {}
+    }
+  },
+  "security": [
+    {
+      "oauth2": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "API para fornecer um token de autenticação compatível com o fluxo 'Resource Owner Password' do OAuth2"
+    },
+    {
+      "name": "Agenda"
+    },
+    {
+      "name": "AtualizaItensLoteStatus"
+    },
+    {
+      "name": "CampoCalculado"
+    },
+    {
+      "name": "CAST"
+    },
+    {
+      "name": "CentrosDeCustos",
+      "description": "API para Manipulação de Centros de Custos"
+    },
+    {
+      "name": "ChartsImobiliario"
+    },
+    {
+      "name": "ChartsMainPage"
+    },
+    {
+      "name": "Classificacao"
+    },
+    {
+      "name": "ClearCache"
+    },
+    {
+      "name": "Comarcas",
+      "description": "API para Manipulação de Comarcas"
+    },
+    {
+      "name": "Compra"
+    },
+    {
+      "name": "ConsultasExportadas"
+    },
+    {
+      "name": "ContratadoApontado"
+    },
+    {
+      "name": "Contratos",
+      "description": "Api para Manipulação de Contratos"
+    },
+    {
+      "name": "CreateURL"
+    },
+    {
+      "name": "DataSources",
+      "description": "Api para acessar as consultas disponíveis no sistema"
+    },
+    {
+      "name": "Departamentos",
+      "description": "API para Manipulação de Departamentos"
+    },
+    {
+      "name": "DesmontaInformacoesGuia"
+    },
+    {
+      "name": "Divisoes",
+      "description": "API para Manipulação de Divisões"
+    },
+    {
+      "name": "Filiais",
+      "description": "API para Manipulação de Filiais"
+    },
+    {
+      "name": "FiltroPessoas"
+    },
+    {
+      "name": "Groups",
+      "description": "API para gerenciar Grupos de Usuários do sistema."
+    },
+    {
+      "name": "InfoCombosDocumentosLote"
+    },
+    {
+      "name": "JuridicoAssistant"
+    },
+    {
+      "name": "LGPD",
+      "description": "Api de apoio à LGPD"
+    },
+    {
+      "name": "LoteDocumentos"
+    },
+    {
+      "name": "Moedas",
+      "description": "API para Manipulação de Moedas"
+    },
+    {
+      "name": "Monitoramento"
+    },
+    {
+      "name": "MontaInformacoesGuia"
+    },
+    {
+      "name": "MontaUrlAnexarDocumentos"
+    },
+    {
+      "name": "MontaUrlInformacoesGuia"
+    },
+    {
+      "name": "MontaUrlParticipante"
+    },
+    {
+      "name": "NIP"
+    },
+    {
+      "name": "Pareceres",
+      "description": "API para Manipulação de Pareceres"
+    },
+    {
+      "name": "Pessoas",
+      "description": "API para manipulação de pessoas."
+    },
+    {
+      "name": "ProcessoDocumentos",
+      "description": "API para Manipulação de Documentos de Pastas"
+    },
+    {
+      "name": "Processos",
+      "description": "API para Manipulação de Processos"
+    },
+    {
+      "name": "Procuracoes",
+      "description": "API para Manipulação de Procurações"
+    },
+    {
+      "name": "ResultFields"
+    },
+    {
+      "name": "Roles",
+      "description": "API para gerenciar Papéis do sistema."
+    },
+    {
+      "name": "ToolTip"
+    },
+    {
+      "name": "Users",
+      "description": "API para gerenciar Usuários do sistema."
+    },
+    {
+      "name": "VerificaCamposGuia"
+    }
+  ]
+}

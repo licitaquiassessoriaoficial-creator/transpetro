@@ -7,13 +7,13 @@
   restartPolicyType = "never"
 
 [variables]
-  # Kurier Distribuição - URLs HTTP para compatibilidade com ServicePointManager
-  Kurier__BaseUrl = "http://www.kurierservicos.com.br/wsservicos/"
+  # Kurier Distribuição - URLs HTTPS
+  Kurier__BaseUrl = "https://www.kurierservicos.com.br/wsservicos/"
   Kurier__User = "o.de.quadro.distribuicao"
   Kurier__Pass = "855B07EB-99CE-46F1-81CC-4785B090DD72"
   
-  # Kurier Jurídico - URLs HTTP para compatibilidade com ServicePointManager
-  KurierJuridico__BaseUrl = "http://www.kurierservicos.com.br/wsservicos/"
+  # Kurier Jurídico - URLs HTTPS
+  KurierJuridico__BaseUrl = "https://www.kurierservicos.com.br/wsservicos/"
   KurierJuridico__User = "osvaldoquadro"
   KurierJuridico__Pass = "159811"
   

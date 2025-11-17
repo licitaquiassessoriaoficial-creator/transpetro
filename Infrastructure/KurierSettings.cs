@@ -8,7 +8,7 @@ public class KurierSettings
     /// <summary>
     /// URL base da API Kurier
     /// </summary>
-    public string BaseUrl { get; set; } = "http://www.kurierservicos.com.br/wsservicos/";
+    public string BaseUrl { get; set; } = "https://www.kurierservicos.com.br/wsservicos/";
     
     /// <summary>
     /// Usuário para autenticação Basic Auth

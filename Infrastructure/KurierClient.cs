@@ -535,7 +535,7 @@ public class KurierClient : IKurierClient, IDisposable
     /// </summary>
     public async Task ConfirmarPublicacoesAsync(IEnumerable<string> idsOuNumerosProcesso, CancellationToken cancellationToken = default)
     {
-                const string endpoint = "api/KPublicacao/ConfirmarPublicacoes";
+        const string endpoint = "api/KJuridico/ConfirmarPublicacoes";
         
         try
         {

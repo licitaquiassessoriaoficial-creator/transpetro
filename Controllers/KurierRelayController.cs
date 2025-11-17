@@ -4,6 +4,11 @@ using System.Text;
 using System.Net;
 using Polly;
 using Polly.Extensions.Http;
+using System.IO; // Adicionado para StreamReader
+using Microsoft.AspNetCore.Http; // Adicionado para EnableBuffering
+using System.Net.Http; // Adicionado para HttpClient
+using System.Threading.Tasks; // Adicionado para Task
+using System.Linq; // Adicionado para LINQ
 
 namespace BennerKurierWorker.Controllers;
 
@@ -19,16 +24,54 @@ public class KurierRelayController : ControllerBase
     private readonly ILogger<KurierRelayController> _logger;
     private readonly KurierRelaySettings _settings;
     private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
+    private readonly TranspetroSettings _transpetroSettings;
 
     public KurierRelayController(
         IHttpClientFactory httpClientFactory,
         ILogger<KurierRelayController> logger,
-        IOptions<KurierRelaySettings> settings)
+        IOptions<KurierRelaySettings> settings,
+        IOptions<TranspetroSettings> transpetroSettings)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _settings = settings.Value;
         _retryPolicy = CreateRetryPolicy();
+        _transpetroSettings = transpetroSettings.Value;
+    }
+
+    /// <summary>
+    /// Endpoint para integração: busca dados na Kurier e envia para Transpetro
+    /// </summary>
+    [HttpPost("integrar")]
+    public async Task<IActionResult> IntegrarAsync()
+    {
+        try
+        {
+            // Busca dados na Kurier
+            var httpClientKurier = _httpClientFactory.CreateClient("KurierRelay");
+            var kurierUrl = _settings.BaseUrl.TrimEnd('/') + "/api/KDistribuicao/ConsultarDistribuicoes";
+            var kurierResponse = await httpClientKurier.GetAsync(kurierUrl);
+            kurierResponse.EnsureSuccessStatusCode();
+            var kurierData = await kurierResponse.Content.ReadAsStringAsync();
+
+            // Envia dados para Transpetro
+            var httpClientTranspetro = _httpClientFactory.CreateClient("Transpetro");
+            var transpetroUrl = _transpetroSettings.BaseUrl.TrimEnd('/') + "/api/receber-dados";
+            var content = new StringContent(kurierData, Encoding.UTF8, "application/json");
+            var transpetroResponse = await httpClientTranspetro.PostAsync(transpetroUrl, content);
+            transpetroResponse.EnsureSuccessStatusCode();
+            var transpetroResult = await transpetroResponse.Content.ReadAsStringAsync();
+
+            return Ok(new {
+                status = "success",
+                kurierDataLength = kurierData.Length,
+                transpetroResult
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
     }
 
     /// <summary>
@@ -71,39 +114,63 @@ public class KurierRelayController : ControllerBase
             stopwatch.Stop();
             
             // Log da resposta
-            var responseBody = await response.Content.ReadAsStringAsync();
+            // Garante que a resposta seja lida como texto UTF-8
+            var responseBytes = await response.Content.ReadAsByteArrayAsync();
+            // Detecta e descompacta GZIP se necessário
+            if (response.Content.Headers.ContentEncoding.Contains("gzip"))
+            {
+                using (var compressedStream = new System.IO.MemoryStream(responseBytes))
+                using (var gzipStream = new System.IO.Compression.GZipStream(compressedStream, System.IO.Compression.CompressionMode.Decompress))
+                using (var resultStream = new System.IO.MemoryStream())
+                {
+                    await gzipStream.CopyToAsync(resultStream);
+                    responseBytes = resultStream.ToArray();
+                }
+            }
+            var responseBody = System.Text.Encoding.UTF8.GetString(responseBytes);
             var responseSize = responseBody.Length;
             
             _logger.LogInformation("✅ [REQ-{RequestId}] Resposta recebida: {StatusCode} | {Duration}ms | {Size} chars", 
                 requestId, (int)response.StatusCode, stopwatch.ElapsedMilliseconds, responseSize);
 
-            // Log resumido do conteúdo (primeiros 200 caracteres)
-            if (!string.IsNullOrEmpty(responseBody))
-            {
-                var preview = responseBody.Length > 200 
-                    ? responseBody[..200] + "..."
-                    : responseBody;
-                _logger.LogDebug("📄 [REQ-{RequestId}] Conteúdo: {Preview}", requestId, preview);
-            }
+            // Log completo do conteúdo da resposta para diagnóstico
+            // (deve ser feito após wrappedJson ser definido)
 
             // Tenta transformar a resposta em JSON com campo esperado
             string wrappedJson = responseBody;
-            if (response.Content.Headers.ContentType?.MediaType == "application/json")
+            // Detecta se é JSON ou XML
+            string contentType = response.Content.Headers.ContentType?.MediaType ?? "application/json";
+            if (contentType.Contains("json"))
             {
+                // Se a resposta estiver vazia ou nula, retorna array vazio
+                var isEmpty = string.IsNullOrWhiteSpace(responseBody) || responseBody == "null";
                 if (targetUrl.ToLower().Contains("consultardistribuicoes"))
                 {
-                    wrappedJson = $"{{\"distribuicoes\":{responseBody}}}";
+                    wrappedJson = isEmpty ? "{\"distribuicoes\":[]}" : $"{{\"distribuicoes\":{responseBody}}}";
                 }
                 else if (targetUrl.ToLower().Contains("consultarpublicacoes"))
                 {
-                    wrappedJson = $"{{\"publicacoes\":{responseBody}}}";
+                    wrappedJson = isEmpty ? "{\"publicacoes\":[]}" : $"{{\"publicacoes\":{responseBody}}}";
                 }
+                contentType = "application/json";
+            }
+            else if (contentType.Contains("xml"))
+            {
+                // Se for XML, apenas retorna como texto
+                wrappedJson = responseBody;
+                contentType = "application/xml";
+            }
+            else
+            {
+                // Se não for reconhecido, retorna como texto puro
+                wrappedJson = responseBody;
+                contentType = "text/plain";
             }
             var result = new ContentResult
             {
                 Content = wrappedJson,
                 StatusCode = (int)response.StatusCode,
-                ContentType = "application/json"
+                ContentType = contentType
             };
             return result;
         }
@@ -210,10 +277,43 @@ public class KurierRelayController : ControllerBase
     /// </summary>
     private string BuildTargetUrl()
     {
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(Request.QueryString.Value ?? "");
+        if (!query.ContainsKey("tipo") || !query.ContainsKey("metodo"))
+        {
+            throw new InvalidOperationException("A query string deve conter os parâmetros 'tipo' e 'metodo'. Exemplo: ?tipo=distribuicao&metodo=consultar");
+        }
+
+        var tipo = query["tipo"].ToString().ToLower();
+        var metodo = query["metodo"].ToString().ToLower();
+
+        string apiUrl = tipo switch
+        {
+            "distribuicao" => metodo switch
+            {
+                "consultar" => "api/KDistribuicao/ConsultarDistribuicoes",
+                "confirmar" => "api/KDistribuicao/ConfirmarDistribuicoes",
+                "quantidade" => "api/KDistribuicao/QuantidadeDistribuicoesDisponiveis",
+                "confirmadas" => "api/KDistribuicao/ConsultarDistribuicoesConfirmadas",
+                _ => throw new InvalidOperationException("Método inválido para distribuições.")
+            },
+            "juridico" => metodo switch
+            {
+                "consultar" => "api/KJuridico/ConsultarPublicacoes",
+                "confirmar" => "api/KJuridico/ConfirmarPublicacoes",
+                "quantidade" => "api/KJuridico/ConsultarQuantidadePublicacoesDisponiveis",
+                "personalizado" => "api/KJuridico/ConsultarPublicacoesPersonalizado",
+                _ => throw new InvalidOperationException("Método inválido para jurídico.")
+            },
+            _ => throw new InvalidOperationException("Tipo inválido. Use 'distribuicao' ou 'juridico'.")
+        };
+
         var baseUrl = _settings.BaseUrl.TrimEnd('/');
-        var queryString = Request.QueryString.HasValue ? Request.QueryString.Value : "";
-        
-        return $"{baseUrl}/{queryString}";
+        // Monta a URL final, incluindo outros parâmetros
+        var extraParams = string.Join("&", query.Where(kvp => kvp.Key != "tipo" && kvp.Key != "metodo").Select(kvp => $"{kvp.Key}={kvp.Value}"));
+        var url = string.IsNullOrEmpty(extraParams)
+            ? $"{baseUrl}/{apiUrl}"
+            : $"{baseUrl}/{apiUrl}?{extraParams}";
+        return url;
     }
 
     /// <summary>
@@ -231,6 +331,13 @@ public class KurierRelayController : ControllerBase
                 continue;
 
             request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+        }
+
+        // Adicionar autenticação básica se configurado
+        if (!string.IsNullOrEmpty(_settings.Usuario) && !string.IsNullOrEmpty(_settings.Senha))
+        {
+            var authValue = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_settings.Usuario}:{_settings.Senha}"));
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authValue);
         }
 
         // Adicionar corpo da requisição se existir
@@ -289,7 +396,21 @@ public class KurierRelayController : ControllerBase
 /// </summary>
 public class KurierRelaySettings
 {
-    public string BaseUrl { get; set; } = "https://www.kurierservicos.com.br/wsservicos/";
+    public string BaseUrl { get; set; } = "https://www.kurierservicos.com.br/wsservicos";
+    public string Usuario { get; set; } = "o.de.quadro.distribuicao";
+    public string Senha { get; set; } = "";
     public int TimeoutSeconds { get; set; } = 100;
     public int MaxRetries { get; set; } = 3;
+}
+
+/// <summary>
+/// Configurações específicas para a API Transpetro
+/// </summary>
+public class TranspetroSettings
+{
+    public string BaseUrl { get; set; } = "https://api.transpetro.com.br/";
+    public string Usuario { get; set; } = "";
+    public string Senha { get; set; } = "";
+    public int TimeoutSeconds { get; set; } = 30;
+    public string UserAgent { get; set; } = "BennerKurierWorker/1.0";
 }

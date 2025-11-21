@@ -30,6 +30,11 @@ RUN mkdir -p /app/logs
 ENV DOTNET_ENVIRONMENT=Production
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV RUN_ONCE=true
+ENV PORT=8080
+ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
+
+# Informativo para a porta exposta
+EXPOSE 8080
 
 # Comando de entrada para Railway
 ENTRYPOINT ["dotnet", "BennerKurierWorker.dll"]

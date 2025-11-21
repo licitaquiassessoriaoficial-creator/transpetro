@@ -729,3 +729,4 @@ public class MonitoringSettings
     /// </summary>
     public string ConfirmarPublicacoesKey { get; set; } = "Identificador";
 }
+

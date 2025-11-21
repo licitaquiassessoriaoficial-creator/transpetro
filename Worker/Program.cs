@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpClient("KurierRelay");
 builder.Services.AddEndpointsApiExplorer();
@@ -71,4 +72,6 @@ app.MapPost("/api/kurier/relay", async (HttpContext context, IHttpClientFactory 
         await context.Response.WriteAsync("Internal relay error");
     }
 });
+
+app.Run();
 
